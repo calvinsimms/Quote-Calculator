@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Quote Calculator</title>
 <style>
 h1 {
     font-family: "Brush Script MT", cursive;
     font-size: 50px;
+    margin-top: 10px; /* reduce space above heading */
+    margin-bottom: 10px; /* reduce space below heading */
 }
 body {
     font-family: Arial, sans-serif;
@@ -71,6 +73,8 @@ input:focus {
 
 <h1>Quote Calculator</h1>
 
+
+
 <!-- Input fields -->
 <input type="text" id="items" placeholder="Number of Items" readonly>
 <input type="text" id="distance" placeholder="Distance (kms)" readonly>
@@ -112,6 +116,14 @@ let inputs = [
   document.getElementById('distance')
 ];
 let currentInputIndex = 0;
+
+// Let clicking on inputs switch focus without opening phone keyboard
+inputs.forEach((inp, idx) => {
+    inp.addEventListener('click', () => {
+        currentInputIndex = idx;
+        updateFocus();
+    });
+});
 
 // Highlight current input
 function updateFocus() {
