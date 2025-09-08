@@ -35,7 +35,7 @@ input:focus {
 .number-pad {
   display: flex;
   flex-direction: column;
-  width: 250px;
+  width: 300px;
   margin-top: 20px;
 }
 .pad-row {
@@ -72,8 +72,8 @@ input:focus {
 <h1>Quote Calculator</h1>
 
 <!-- Input fields -->
-<input type="number" id="items" placeholder="Number of Items">
-<input type="number" id="distance" placeholder="Distance (kms)">
+<input type="text" id="items" placeholder="Number of Items" readonly>
+<input type="text" id="distance" placeholder="Distance (kms)" readonly>
 
 <div class="breakdown" id="breakdown"></div>
 <div class="quote" id="quote"></div>
@@ -102,6 +102,7 @@ input:focus {
   </div>
   <div class="pad-row">
     <button id="clear">Clear</button>
+    <button id="clear-all">Clear All</button>
   </div>
 </div>
 
@@ -112,8 +113,12 @@ let inputs = [
 ];
 let currentInputIndex = 0;
 
-// Focus first input initially
-inputs[currentInputIndex].focus();
+// Highlight current input
+function updateFocus() {
+    inputs.forEach((inp, idx) => {
+        inp.style.borderColor = idx === currentInputIndex ? "#007BFF" : "#ccc";
+    });
+}
 
 // Function to calculate quote
 function calculateQuote() {
@@ -131,10 +136,7 @@ function calculateQuote() {
         "Total Quote Estimate: $" + total;
 }
 
-// Event listeners for real-time typing
-inputs.forEach(input => input.addEventListener('input', calculateQuote));
-
-// Number pad logic
+// Number pad input
 document.querySelectorAll('.num').forEach(btn => {
     btn.addEventListener('click', () => {
         let input = inputs[currentInputIndex];
@@ -143,14 +145,14 @@ document.querySelectorAll('.num').forEach(btn => {
     });
 });
 
-// Next & Previous buttons
+// Next & Prev buttons
 document.getElementById('next').addEventListener('click', () => {
     currentInputIndex = (currentInputIndex + 1) % inputs.length;
-    inputs[currentInputIndex].focus();
+    updateFocus();
 });
 document.getElementById('prev').addEventListener('click', () => {
     currentInputIndex = (currentInputIndex - 1 + inputs.length) % inputs.length;
-    inputs[currentInputIndex].focus();
+    updateFocus();
 });
 
 // Clear button
@@ -159,8 +161,15 @@ document.getElementById('clear').addEventListener('click', () => {
     calculateQuote();
 });
 
-// Initialize display
+// Clear all button
+document.getElementById('clear-all').addEventListener('click', () => {
+    inputs.forEach(input => input.value = '');
+    calculateQuote();
+});
+
+// Initialize
 calculateQuote();
+updateFocus();
 </script>
 
 </body>
