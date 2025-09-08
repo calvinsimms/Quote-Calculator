@@ -186,16 +186,6 @@ document.getElementById('clear-all').addEventListener('click', () => {
 calculateQuote();
 updateFocus();
 
-// Prevent double-tap zoom
-let lastTouch = 0;
-document.addEventListener('touchend', function (event) {
-    let now = new Date().getTime();
-    if (now - lastTouch <= 300) {
-        event.preventDefault(); // prevent zoom
-    }
-    lastTouch = now;
-}, false);
-
 </script>
 
 </body>
