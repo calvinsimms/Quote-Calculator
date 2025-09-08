@@ -6,44 +6,47 @@
 <title>Quote Calculator</title>
 <style>
 h1 {
-    font-family: "Brush Script MT", cursive;
-    font-size: 50px;
-    margin-top: 10px; /* reduce space above heading */
-    margin-bottom: 10px; /* reduce space below heading */
+  font-family: "Brush Script MT", cursive;
+  font-size: 50px;
+  margin-top: 10px; 
+  margin-bottom: 10px; 
+  background-color: #f0f0f0;  
+  padding: 10px;
+  border-radius: 10px;
 }
 body {
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0;
-    padding: 20px;
-    text-align: center;
-    font-size: 20px; 
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  font-size: 20px; 
 }
 input { 
-    text-align: center; 
-    margin: 5px 0; 
-    width: 250px; 
-    padding: 8px;
-    border-radius: 10px;
-    font-size: 20px; 
-    border: 2px solid #ccc;
+  text-align: center; 
+  margin: 5px 0; 
+  width: 250px; 
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 20px; 
+  border: 2px solid #ccc;
 }
 input:focus {
-    border-color: #007BFF;
-    outline: none;
+  border-color: #007BFF;
+  outline: none;
 }
 .number-pad {
   display: flex;
   flex-direction: column;
   width: 300px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 .pad-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 }
 .number-pad button {
   flex: 1;
@@ -58,14 +61,14 @@ input:focus {
   background-color: #d0d0d0;
 }
 .quote { 
-    margin-top: 20px; 
-    font-weight: bold; 
-    font-size: 23px;
+  margin-top: 20px; 
+  font-weight: bold; 
+  font-size: 23px;
 }
 .breakdown { 
-    margin-top: 20px; 
-    font-weight: bold; 
-    font-size: 20px; 
+  margin-top: 20px; 
+  font-weight: bold; 
+  font-size: 20px; 
 }
 </style>
 </head>
@@ -190,4 +193,3 @@ updateFocus();
 
 </body>
 </html>
-
