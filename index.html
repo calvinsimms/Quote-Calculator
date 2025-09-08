@@ -96,7 +96,7 @@ input:focus {
     <button class="num">9</button>
   </div>
   <div class="pad-row">
-    <button id="prev">Prev</button>
+    <button id="delete">Delete</button>
     <button class="num">0</button>
     <button id="next">Next</button>
   </div>
@@ -145,14 +145,17 @@ document.querySelectorAll('.num').forEach(btn => {
     });
 });
 
-// Next & Prev buttons
+// Next button
 document.getElementById('next').addEventListener('click', () => {
     currentInputIndex = (currentInputIndex + 1) % inputs.length;
     updateFocus();
 });
-document.getElementById('prev').addEventListener('click', () => {
-    currentInputIndex = (currentInputIndex - 1 + inputs.length) % inputs.length;
-    updateFocus();
+
+// Delete button
+document.getElementById('delete').addEventListener('click', () => {
+    let input = inputs[currentInputIndex];
+    input.value = input.value.slice(0, -1); // Remove last character
+    calculateQuote();
 });
 
 // Clear button
