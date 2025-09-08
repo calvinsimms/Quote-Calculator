@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quote Calculator</title>
+<style>
+h1 {
+    font-family: "Brush Script MT", cursive;
+    font-size: 50px;
+}
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+    font-size: 20px; 
+}
+input { 
+    text-align: center; 
+    margin: 5px 0; 
+    width: 250px; 
+    padding: 8px;
+    border-radius: 10px;
+    font-size: 20px; 
+    border: 2px solid #ccc;
+}
+input:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+.number-pad {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  margin-top: 20px;
+}
+.pad-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.number-pad button {
+  flex: 1;
+  margin: 2px;
+  padding: 15px;
+  font-size: 20px;
+  border-radius: 10px;
+  border: none;
+  background-color: #f0f0f0;
+}
+.number-pad button:active {
+  background-color: #d0d0d0;
+}
+.quote { 
+    margin-top: 20px; 
+    font-weight: bold; 
+    font-size: 23px;
+}
+.breakdown { 
+    margin-top: 20px; 
+    font-weight: bold; 
+    font-size: 20px; 
+}
+</style>
+</head>
+<body>
+
+<h1>Quote Calculator</h1>
+
+<!-- Input fields -->
+<input type="number" id="items" placeholder="Number of Items">
+<input type="number" id="distance" placeholder="Distance (kms)">
+
+<div class="breakdown" id="breakdown"></div>
+<div class="quote" id="quote"></div>
+
+<!-- Number Pad -->
+<div class="number-pad">
+  <div class="pad-row">
+    <button class="num">1</button>
+    <button class="num">2</button>
+    <button class="num">3</button>
+  </div>
+  <div class="pad-row">
+    <button class="num">4</button>
+    <button class="num">5</button>
+    <button class="num">6</button>
+  </div>
+  <div class="pad-row">
+    <button class="num">7</button>
+    <button class="num">8</button>
+    <button class="num">9</button>
+  </div>
+  <div class="pad-row">
+    <button id="prev">Prev</button>
+    <button class="num">0</button>
+    <button id="next">Next</button>
+  </div>
+  <div class="pad-row">
+    <button id="clear">Clear</button>
+  </div>
+</div>
+
+<script>
+let inputs = [
+  document.getElementById('items'),
+  document.getElementById('distance')
+];
+let currentInputIndex = 0;
+
+// Focus first input initially
+inputs[currentInputIndex].focus();
+
+// Function to calculate quote
+function calculateQuote() {
+    let items = parseInt(inputs[0].value) || 0;
+    let distance = parseInt(inputs[1].value) || 0;
+
+    let base = items * 10;
+    let distanceCost = distance * 2;
+    let total = base + distanceCost;
+
+    document.getElementById('breakdown').innerHTML =
+        "Cost for items: $" + base + "<br>" +
+        "Cost for distance: $" + distanceCost;
+    document.getElementById('quote').innerText =
+        "Total Quote Estimate: $" + total;
+}
+
+// Event listeners for real-time typing
+inputs.forEach(input => input.addEventListener('input', calculateQuote));
+
+// Number pad logic
+document.querySelectorAll('.num').forEach(btn => {
+    btn.addEventListener('click', () => {
+        let input = inputs[currentInputIndex];
+        input.value += btn.textContent;
+        calculateQuote();
+    });
+});
+
+// Next & Previous buttons
+document.getElementById('next').addEventListener('click', () => {
+    currentInputIndex = (currentInputIndex + 1) % inputs.length;
+    inputs[currentInputIndex].focus();
+});
+document.getElementById('prev').addEventListener('click', () => {
+    currentInputIndex = (currentInputIndex - 1 + inputs.length) % inputs.length;
+    inputs[currentInputIndex].focus();
+});
+
+// Clear button
+document.getElementById('clear').addEventListener('click', () => {
+    inputs[currentInputIndex].value = '';
+    calculateQuote();
+});
+
+// Initialize display
+calculateQuote();
+</script>
+
+</body>
+</html>
