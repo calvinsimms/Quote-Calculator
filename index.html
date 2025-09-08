@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quote Calculator</title>
 <style>
 h1 {
@@ -185,7 +185,19 @@ document.getElementById('clear-all').addEventListener('click', () => {
 // Initialize
 calculateQuote();
 updateFocus();
+
+// Prevent double-tap zoom
+let lastTouch = 0;
+document.addEventListener('touchend', function (event) {
+    let now = new Date().getTime();
+    if (now - lastTouch <= 300) {
+        event.preventDefault(); // prevent zoom
+    }
+    lastTouch = now;
+}, false);
+
 </script>
 
 </body>
 </html>
+
