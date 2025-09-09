@@ -190,8 +190,9 @@ button {
 
       const removeBtn = document.createElement("button");
       removeBtn.textContent = "Remove";
-      removeBtn.style.fontSize = "14px";
-      removeBtn.style.width = "70px";
+      removeBtn.style.padding = "0px 0px";
+      removeBtn.style.fontSize = "16px";
+      removeBtn.style.width = "80px"
       removeBtn.addEventListener("click", () => {
         selectedItems.splice(index, 1);
         updateItemsList();
