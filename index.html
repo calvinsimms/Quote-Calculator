@@ -67,13 +67,14 @@ input:focus {
   font-weight: bold; 
   font-size: 20px; 
 }
+.value {
+  color: #007BFF;
+}
 </style>
 </head>
 <body>
 
 <h1>Quote Calculator</h1>
-
-
 
 <!-- Input fields -->
 <input type="text" id="items" placeholder="Number of Items" readonly>
@@ -134,18 +135,25 @@ function updateFocus() {
 
 // Function to calculate quote
 function calculateQuote() {
-    let items = parseInt(inputs[0].value) || 0;
-    let distance = parseInt(inputs[1].value) || 0;
+  let items = parseInt(inputs[0].value) || 0;
+  let distance = parseInt(inputs[1].value) || 0;
 
-    let base = items * 10;
-    let distanceCost = distance * 2;
-    let total = base + distanceCost;
+  let base = items * 10;
+  let distanceCost = distance * 2;
+  let total = base + distanceCost;
 
-    document.getElementById('breakdown').innerHTML =
-        "Cost for items: $" + base + "<br>" +
-        "Cost for distance: $" + distanceCost;
-    document.getElementById('quote').innerText =
-        "Total Quote Estimate: $" + total;
+  // New logic for employees and trailer size
+  let employees = items >= 50 ? 3 : 2;
+  let trailer = items >= 50 ? "Large" : "Medium";
+
+  document.getElementById('breakdown').innerHTML =
+      "Employees needed: " + employees + "<br>" +
+      "Trailer size: " + trailer + "<br>" +
+      "Cost for items: $" + base + "<br>" +
+      "Cost for distance: $" + distanceCost;
+
+  document.getElementById('quote').innerText =
+      "Total Quote Estimate: $" + total;
 }
 
 // Number pad input
@@ -185,7 +193,6 @@ document.getElementById('clear-all').addEventListener('click', () => {
 // Initialize
 calculateQuote();
 updateFocus();
-
 </script>
 
 </body>
