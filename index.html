@@ -141,6 +141,7 @@ function calculateQuote() {
   let base = items * 10;
   let distanceCost = distance * 2;
   let total = base + distanceCost;
+  let time = (items * 0.5) + distance
 
   // New logic for employees and trailer size
   let employees = items >= 50 ? 3 : 2;
@@ -152,8 +153,9 @@ function calculateQuote() {
       "Cost for items: $" + base + "<br>" +
       "Cost for distance: $" + distanceCost;
 
-  document.getElementById('quote').innerText =
-      "Total Quote Estimate: $" + total;
+  document.getElementById('quote').innerHTML =
+      "Total Quote: $" + total + "<br>" +
+      "Total Time: " + time + "mins";
 }
 
 // Number pad input
