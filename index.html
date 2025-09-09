@@ -141,7 +141,11 @@ function calculateQuote() {
   let base = items * 10;
   let distanceCost = distance * 2;
   let total = base + distanceCost;
-  let time = (items * 0.5) + distance
+  
+  let totalMinutes = (items * 0.5) + distance;
+  let hours = Math.floor(totalMinutes / 60);
+  let minutes = Math.round(totalMinutes % 60);
+  let timeFormatted = hours + ":" + (minutes < 10 ? "0" : "") + minutes;
 
   // New logic for employees and trailer size
   let employees = items >= 50 ? 3 : 2;
@@ -155,7 +159,7 @@ function calculateQuote() {
 
   document.getElementById('quote').innerHTML =
       "Total Quote: $" + total + "<br>" +
-      "Total Time: " + time + "mins";
+      "Total Time: " + timeFormatted;
 }
 
 // Number pad input
