@@ -192,7 +192,7 @@ button {
       removeBtn.textContent = "X";
       removeBtn.style.padding = "0px 0px";
       removeBtn.style.fontSize = "16px";
-      removeBtn.style.width = "15px"
+      removeBtn.style.width = "25px"
       removeBtn.addEventListener("click", () => {
         selectedItems.splice(index, 1);
         updateItemsList();
@@ -212,16 +212,20 @@ button {
   }
 
   function calculateQuote() {
-    let totalCuFt = 0, totalTime = 0;
+    let totalCuFt = 0;
+    let totalTime = 0;
+    let totalMen = 0;
+
     selectedItems.forEach(i => {
-      totalCuFt += itemsData[i.name].cubicFeet * i.quantity;
-      totalTime += itemsData[i.name].time * i.quantity;
-      totalMen = Math.max(totalMen, itemsData[i.name].menNeeded); 
+        totalCuFt += itemsData[i.name].cubicFeet * i.quantity;
+        totalTime += itemsData[i.name].time * i.quantity;
+        totalMen = Math.max(totalMen, itemsData[i.name].menNeeded);
     });
 
     const totalsDiv = document.getElementById("totals");
     totalsDiv.innerHTML = `Total Cubic Feet: ${totalCuFt} <br> Men Needed: ${totalMen} <br> Total Time: ${formatTime(totalTime)}`;
-  }
+}
+
 
   updateItemsList();
   calculateQuote();
@@ -229,4 +233,3 @@ button {
 
 </body>
 </html>
-
