@@ -70,11 +70,23 @@ button {
   </div>
 </div>
 
-<!-- Display added items -->
+<!-- Display selected items -->
 <div id="items-list"></div>
 
+
+<!-- Input load address -->
+<div id="item-inputs" style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 0px; position: relative; max-width: 300px; margin-bottom: 5px; margin-top: 5px;">
+  <input type="text" id="item-select" placeholder="Load Address" autocomplete="off">
+</div>
+
+<!-- Input unload address -->
+<div id="item-inputs" style="display: flex; flex-direction: column; gap: 5px; margin-bottom: 0px; position: relative; max-width: 300px; margin-bottom: 5px;">
+  <input type="text" id="item-select" placeholder="Unload Address" autocomplete="off">
+</div>
+
+<!-- Display base values -->
 <div id="totals" style="margin-top: 10px; font-weight: bold;">
-  Total Cubic Feet: 0 <br> Total Time: 00:00
+  Total Cubic Feet: 0 <br> Men Needed: 0 <br> Total Time: 00:00
 </div>
 
 
@@ -101,12 +113,12 @@ button {
       itemsData = {};
       itemsList = [];
 
-      lines.slice(1).forEach(line => { // Skip header row
-        const cols = parseCSVLine(line).slice(0, 3); // Only first 3 columns
-        const [name, cubicFeet, time] = cols;
+      lines.slice(1).forEach(line => { 
+        const cols = parseCSVLine(line).slice(0, 4);
+        const [name, cubicFeet, time, menNeeded] = cols;
 
         if (name && cubicFeet && time) {
-          itemsData[name] = { cubicFeet: parseFloat(cubicFeet), time: parseInt(time) };
+          itemsData[name] = { cubicFeet: parseFloat(cubicFeet), time: parseInt(time), menNeeded: parseInt(menNeeded) };
           itemsList.push(name);
         }
       });
@@ -160,7 +172,7 @@ button {
     let itemName = searchInput.value.trim();
     let quantity = parseInt(document.getElementById("item-quantity").value) || 0;
 
-    if(quantity > 0 && itemsData[itemName]) { // ensure item exists
+    if(quantity > 0 && itemsData[itemName]) { 
       let existing = selectedItems.find(i => i.name === itemName);
       if(existing){
         existing.quantity += quantity;
@@ -189,9 +201,10 @@ button {
       text.textContent = `${item.name} x${item.quantity}`;
 
       const removeBtn = document.createElement("button");
-      removeBtn.textContent = "Remove";
-      removeBtn.style.fontSize = "14px";
-      removeBtn.style.width = "70px";
+      removeBtn.textContent = "X";
+      removeBtn.style.padding = "0px 0px";
+      removeBtn.style.fontSize = "16px";
+      removeBtn.style.width = "25px"
       removeBtn.addEventListener("click", () => {
         selectedItems.splice(index, 1);
         updateItemsList();
@@ -211,15 +224,20 @@ button {
   }
 
   function calculateQuote() {
-    let totalCuFt = 0, totalTime = 0;
+    let totalCuFt = 0;
+    let totalTime = 0;
+    let totalMen = 0;
+
     selectedItems.forEach(i => {
-      totalCuFt += itemsData[i.name].cubicFeet * i.quantity;
-      totalTime += itemsData[i.name].time * i.quantity;
+        totalCuFt += itemsData[i.name].cubicFeet * i.quantity;
+        totalTime += itemsData[i.name].time * i.quantity;
+        totalMen = Math.max(totalMen, itemsData[i.name].menNeeded);
     });
 
     const totalsDiv = document.getElementById("totals");
-    totalsDiv.innerHTML = `Total Cubic Feet: ${totalCuFt} <br> Total Time: ${formatTime(totalTime)}`;
-  }
+    totalsDiv.innerHTML = `Total Cubic Feet: ${totalCuFt} <br> Men Needed: ${totalMen} <br> Total Time: ${formatTime(totalTime)}`;
+}
+
 
   updateItemsList();
   calculateQuote();
