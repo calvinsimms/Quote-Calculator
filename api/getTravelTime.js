@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiKey = process.env.GOOGLE_API_KEY; // stored securely in Vercel environment variables
+    const apiKey = process.env.GOOGLE_API_KEY;
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${origin}&destinations=${destination}&mode=driving&key=${apiKey}`
     );
