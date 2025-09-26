@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quote Calculator</title>
+<style>
+
+h1 { 
+  font-family: "Brush Script MT", cursive; 
+  font-size: 45px; 
+  margin-bottom: 5px;
+  margin-top: 0; 
+}
+
+body { 
+  font-family: Arial, sans-serif; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  margin: 0; 
+  padding: 20px; 
+  text-align: center; 
+  font-size: 20px;
+}
+
+input, select, button { 
+  text-align: center; 
+  width: 250px; 
+  padding: 5px; 
+  border-radius: 20px; 
+  font-size: 20px; 
+  border: 2px solid #ccc; 
+}
+
+input:focus, select:focus { 
+  border-color: #007BFF; 
+  outline: none; 
+}
+
+button { 
+  cursor: pointer; 
+}
+
+/* ==========================
+   Sections
+   ========================== */
+.quote { 
+  margin-top: 10px; 
+  font-weight: bold; 
+  font-size: 23px; 
+}
+
+.breakdown { 
+  margin-top: 10px; 
+  font-weight: bold; 
+  font-size: 20px; 
+}
+
+#items-list { 
+  margin-top: 0; 
+}
+
+/* ==========================
+   Layout Helpers
+   ========================== */
+
+/* Container for grouped inputs */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-width: 300px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Row layout (side by side inputs/buttons) */
+.row {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+/* Dropdown menu */
+.dropdown {
+  position: absolute;
+  top: 38px;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  max-height: 120px;
+  overflow-y: auto;
+  display: none;
+  z-index: 100;
+}
+
+/* Small input (like quantity) */
+.small-input {
+  flex: 1;
+  margin-bottom: 5px;
+  max-width: 60px;
+}
+
+/* Small button */
+.small-button {
+  flex: 1;
+  max-width: 75px;
+  margin-bottom: 5px;
+}
+
+/* Calculate button */
+.calculate-button {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+  max-width: 120px;
+  margin: 5px 0 0 0;
+}
+
+/* Totals output */
+.totals {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+</style>
+
+<!-- =========================== HTML =========================== -->
+<!-- =========================== HTML =========================== -->
+<!-- =========================== HTML =========================== -->
+<!-- =========================== HTML =========================== -->
+
+</head>
+<body>
+
+<h1>Quote Calculator</h1>
+
+<!-- Item input fields -->
+<div id="item-inputs" class="input-container">
+  <input type="text" id="item-select" placeholder="Select item" autocomplete="off">
+  <div id="dropdown" class="dropdown"></div>
+  <div class="row">
+    <input type="number" id="item-quantity" placeholder="#" min="1" class="small-input">
+    <button id="add-item" class="small-button">Add</button>
+  </div>
+</div>
+
+<div id="items-list"></div>
+
+<div id="travel-input" class="input-container">
+  <input type="number" id="travel-minutes" placeholder="Travel minutes per trip" min="0">
+</div>
+
+<button id="calculate-route" class="calculate-button">Calculate</button>
+
+<div id="totals" class="totals"></div>
+
+
+<!-- =========================== JAVASCRIPT =========================== -->
+<!-- =========================== JAVASCRIPT =========================== -->
+<!-- =========================== JAVASCRIPT =========================== -->
+<!-- =========================== JAVASCRIPT =========================== -->
+
+<script>
+
+// Define items with their cubic feet (size), estimated time to move (minutes),
+// and number of men usually needed.
+let itemsData = {
+  "Sofa": { cubicFeet: 60, time: 30, menNeeded: 2 },
+  "Dining Table": { cubicFeet: 40, time: 20, menNeeded: 2 },
+  "Bed (Queen)": { cubicFeet: 50, time: 25, menNeeded: 2 },
+  "Dresser": { cubicFeet: 30, time: 15, menNeeded: 1 },
+  "Box (Large)": { cubicFeet: 10, time: 5, menNeeded: 1 },
+  "Box (Small)": { cubicFeet: 5, time: 3, menNeeded: 1 }
+};
+
+// Create an array of item names (["Sofa", "Dining Table", ...])
+let itemsList = Object.keys(itemsData);
+
+// Holds all the items the user selects
+let selectedItems = [];
+
+// ==========================
+// AUTOCOMPLETE DROPDOWN LOGIC
+// ==========================
+
+// Grab the input box where the user types the item name
+const searchInput = document.getElementById("item-select");
+// Grab the dropdown div (the results box)
+const dropdown = document.getElementById("dropdown");
+
+// When user types into the input box
+searchInput.addEventListener("input", () => {
+  const val = searchInput.value.toLowerCase(); // normalize for case-insensitive search
+  dropdown.innerHTML = ""; // clear old results
+
+  // If nothing typed, hide dropdown
+  if (val === "") { 
+    dropdown.style.display = "none"; 
+    return; 
+  }
+
+  // Filter the items that match the typed text
+  itemsList.filter(i => i.toLowerCase().includes(val)).forEach(item => {
+    const div = document.createElement("div");
+    div.textContent = item;
+    div.style.padding = "5px";
+    div.style.cursor = "pointer";
+
+    // When user clicks an item, fill the input and close dropdown
+    div.addEventListener("click", () => { 
+      searchInput.value = item; 
+      dropdown.style.display = "none"; 
+    });
+
+    dropdown.appendChild(div);
+  });
+
+  // Show dropdown only if there are results
+  dropdown.style.display = dropdown.children.length ? "block" : "none";
+});
+
+// Close dropdown if clicking outside of it
+document.addEventListener("click", (e) => { 
+  if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.style.display = "none"; 
+  }
+});
+
+// ==========================
+// ADDING ITEMS TO LIST
+// ==========================
+
+document.getElementById("add-item").addEventListener("click", () => {
+  let itemName = searchInput.value.trim(); // get name from input
+  let quantity = parseInt(document.getElementById("item-quantity").value) || 0;
+
+  // Only add valid items with quantity > 0
+  if (quantity > 0 && itemsData[itemName]) {
+    // If item already exists in list, increase its quantity
+    let existing = selectedItems.find(i => i.name === itemName);
+    if (existing) existing.quantity += quantity;
+    else selectedItems.push({ name: itemName, quantity: quantity });
+
+    // Clear input fields
+    document.getElementById("item-quantity").value = ''; 
+    searchInput.value = '';
+
+    // Update display + recalculate
+    updateItemsList(); 
+    calculateQuote();
+  }
+});
+
+// ==========================
+// UPDATE SELECTED ITEMS LIST
+// ==========================
+
+function updateItemsList() {
+  const listDiv = document.getElementById("items-list");
+  listDiv.innerHTML = "<strong>Selected Items:</strong><br>";
+
+  // Loop through selected items and display them with a remove button
+  selectedItems.forEach((item, index) => {
+    const itemDiv = document.createElement("div");
+    itemDiv.style.display = "flex"; 
+    itemDiv.style.justifyContent = "center"; 
+    itemDiv.style.alignItems = "center"; 
+    itemDiv.style.gap = "10px";
+
+    const text = document.createElement("span"); 
+    text.textContent = `${item.name} x${item.quantity}`;
+
+    // Create remove button ("X")
+    const removeBtn = document.createElement("button"); 
+    removeBtn.textContent = "X"; 
+    removeBtn.style.padding = "0px 0px"; 
+    removeBtn.style.fontSize = "16px"; 
+    removeBtn.style.width = "25px";
+
+    // When clicked, remove this item and recalculate
+    removeBtn.addEventListener("click", () => { 
+      selectedItems.splice(index, 1); 
+      updateItemsList(); 
+      calculateQuote(); 
+    });
+
+    itemDiv.appendChild(text); 
+    itemDiv.appendChild(removeBtn); 
+    listDiv.appendChild(itemDiv);
+  });
+}
+
+// ==========================
+// HELPER: FORMAT TIME
+// ==========================
+
+function formatTime(totalMinutes) {
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  // Return formatted string like "01:30"
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+}
+
+// ==========================
+// CALCULATE QUOTE
+// ==========================
+
+// Trigger calculation when button is clicked
+document.getElementById("calculate-route").addEventListener("click", () => { 
+  calculateQuote(true); 
+});
+
+function calculateQuote(includeTravel = false) {
+  let totalCuFt = 0,        // total cubic feet
+      totalTime = 0,        // total estimated move time (minutes)
+      totalMen = 0,         // number of movers needed
+      quote = 0,            // total cost
+      travelMinutes = 0;    // travel time per trip (user input)
+
+  // Define trailer options
+  const trailers = [
+    { name: "Small Trailer", size: 670 },
+    { name: "Large Trailer", size: 750 }
+  ];
+
+  // Add up cubic feet and time based on selected items
+  selectedItems.forEach(i => { 
+    totalCuFt += itemsData[i.name].cubicFeet * i.quantity; 
+    totalTime += itemsData[i.name].time * i.quantity; 
+  });
+
+  // Calculate how many trips each trailer would need
+  const trailerInfo = trailers.map(t => ({ 
+    ...t, 
+    trips: Math.ceil(totalCuFt / t.size) 
+  }));
+
+  // Get the fewest trips possible
+  const minTrips = Math.min(...trailerInfo.map(t => t.trips));
+
+  // Decide how many movers are needed based on load size
+  const avgTrailerSize = (670 + 750) / 2; 
+  const loads = totalCuFt / avgTrailerSize;
+  totalMen = loads <= 1.4 ? 2 : loads <= 1.9 ? 3 : 4;
+
+  // Hourly rate depending on crew size
+  const rate = {2:120, 3:160, 4:200}[totalMen] || 200;
+
+  // If travel time field is used, include it
+  if (includeTravel) {
+    travelMinutes = parseInt(document.getElementById("travel-minutes").value) || 0;
+  }
+
+  // Total estimated time = load/unload time + travel time (per trip)
+  const totalEstimatedMinutes = totalTime + travelMinutes * minTrips;
+
+  // Quote = (total time in hours) * hourly rate
+  quote = totalEstimatedMinutes * rate / 60;
+
+  // Update totals display
+  const totalsDiv = document.getElementById("totals");
+  totalsDiv.innerHTML = 
+    `Total Cubic Feet: ${totalCuFt} 
+    <br> Men Needed: ${totalMen} 
+    <br> ${trailerInfo.map(t => `${t.name}: ${t.trips} trip(s)`).join("<br>")}
+    <br> Total Time: ${formatTime(Math.round(totalEstimatedMinutes))}
+    <br><br><span style="font-size:28px;font-weight:bold;">Quote: $${quote.toFixed(2)}</span>`;
+}
+
+// Initial display
+updateItemsList();
+calculateQuote();
+</script>
+
+</body>
+</html>
