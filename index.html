@@ -475,7 +475,7 @@ function calculateQuote(includeTravel = false) {
     <br> Men Needed: ${totalMen} 
     <br> ${trailerInfo.map(t => `${t.name}: ${t.trips} trip(s)`).join("<br>")}
     <br> Total Time: ${formatTime(Math.round(totalEstimatedMinutes))}
-    <br><br><span style="font-size:28px;font-weight:bold;">Quote: $${quote.toFixed(2)}</span>`;
+    <br><br><span style="font-size:28px;font-weight:bold;">$${quote.toFixed(2)}</span>`;
 }
 
 // Initial display
