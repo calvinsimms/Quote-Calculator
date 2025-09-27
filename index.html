@@ -47,7 +47,7 @@ input, select, button {
     text-align: center; 
     margin-top: 5px;
     width: 290px; 
-    padding: 3px; 
+    padding: 4px; 
     border-radius: 20px; 
     font-size: 16px; 
     border: none; 
@@ -171,19 +171,34 @@ input::placeholder {
 
 .dropdown {
   position: absolute;
-  top: 37px;
-  width: 296px; 
-  background: #fff;
-  border: 1px solid #ececec;
+  top: 39px;
+  width: 301px; 
+  max-height: 362px;
+  background: rgba(255, 255, 255, 0.5);
   border-radius: 20px;
   font-size: 16px;
-  max-height: 300px;
   overflow-y: auto;
   display: none;
   z-index: 100;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px);
 }
 
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(91, 91, 91, 0.05);
+}
+
+/* Remove line from the last item */
+.dropdown-item:last-child {
+  border-bottom: none;
+}
 
 .totals {
   box-sizing: border-box;
@@ -299,9 +314,8 @@ function updateDropdown() {
     .filter(item => item.toLowerCase().includes(val))
     .forEach(item => {
       const div = document.createElement("div");
+      div.classList.add("dropdown-item"); // <--- important for CSS
       div.textContent = item;
-      div.style.padding = "5px";
-      div.style.cursor = "pointer";
       div.addEventListener("click", () => {
         searchInput.value = item;
         dropdown.style.display = "none";
@@ -315,40 +329,13 @@ function updateDropdown() {
 // Clear input on focus and show full dropdown
 searchInput.addEventListener("focus", () => {
   searchInput.value = ""; // clear previous value
-  updateDropdown();       // show full list
+  updateDropdown();       // <--- use updateDropdown instead of manual divs
 });
 
 // Filter as user types
 searchInput.addEventListener("input", updateDropdown);
 
 // Close dropdown if clicking outside
-document.addEventListener("click", (e) => { 
-  if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-    dropdown.style.display = "none"; 
-  }
-});
-
-
-// Show full list on focus (when clicking into the box)
-searchInput.addEventListener("focus", () => {
-  dropdown.innerHTML = "";
-  itemsList.forEach(item => {
-    const div = document.createElement("div");
-    div.textContent = item;
-    div.style.padding = "5px";
-    div.style.cursor = "pointer";
-    div.addEventListener("click", () => {
-      searchInput.value = item;
-      dropdown.style.display = "none";
-    });
-    dropdown.appendChild(div);
-  });
-  dropdown.style.display = "block";
-});
-
-
-
-// Close dropdown if clicking outside of it
 document.addEventListener("click", (e) => { 
   if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
     dropdown.style.display = "none"; 
@@ -434,10 +421,6 @@ function updateItemsList() {
   });
 }
 
-
-
-
-
 // ==========================
 // HELPER: FORMAT TIME
 // ==========================
@@ -445,7 +428,6 @@ function updateItemsList() {
 function formatTime(totalMinutes) {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
-  // Return formatted string like "01:30"
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 }
 
@@ -453,95 +435,79 @@ function formatTime(totalMinutes) {
 // CALCULATE QUOTE
 // ==========================
 
-// Trigger calculation when button is clicked
 document.getElementById("calculate-route").addEventListener("click", () => { 
   calculateQuote(true); 
 });
 
 function calculateQuote(includeTravel = false) {
-  let totalCuFt = 0,        // total cubic feet
-      totalTime = 0,        // total estimated move time (minutes)
-      totalMen = 0,         // number of movers needed
-      quote = 0,            // total cost
-      travelMinutes = 0;    // travel time per trip (user input)
+  let totalCuFt = 0, totalTime = 0, totalMen = 0, quote = 0, travelMinutes = 0;
 
-  // Define trailer options
   const trailers = [
     { name: "Small Trailer", size: 670 },
     { name: "Large Trailer", size: 750 }
   ];
 
-  // Add up cubic feet and time based on selected items
   selectedItems.forEach(i => { 
     totalCuFt += itemsData[i.name].cubicFeet * i.quantity; 
     totalTime += itemsData[i.name].time * i.quantity; 
   });
 
-  // Calculate how many trips each trailer would need
   const trailerInfo = trailers.map(t => ({ 
     ...t, 
     trips: Math.ceil(totalCuFt / t.size) 
   }));
 
-  // Get the fewest trips possible
   const minTrips = Math.min(...trailerInfo.map(t => t.trips));
 
-  // Decide how many movers are needed based on load size
   const avgTrailerSize = (670 + 750) / 2; 
   const loads = totalCuFt / avgTrailerSize;
   totalMen = loads <= 1.4 ? 2 : loads <= 1.9 ? 3 : 4;
 
-  // Hourly rate depending on crew size
   const rate = {2:120, 3:160, 4:200}[totalMen] || 200;
 
-  // If travel time field is used, include it
   if (includeTravel) {
-    travelMinutes = parseInt(document.getElementById("travel-minutes").value) || 0;
+    travelMinutes = parseInt(document.getElementById("travel-minutes")?.value) || 0;
   }
 
-  // Total estimated time = load/unload time + travel time (per trip)
   const totalEstimatedMinutes = totalTime + travelMinutes * minTrips;
-
-  // Quote = (total time in hours) * hourly rate
   quote = totalEstimatedMinutes * rate / 60;
 
-  // Update totals display
-    const totalsDiv = document.getElementById("totals");
-    totalsDiv.innerHTML = "";
+  const totalsDiv = document.getElementById("totals");
+  totalsDiv.innerHTML = "";
 
-    const totalCuFtRow = document.createElement("div");
-    totalCuFtRow.classList.add("totals-row");
-    totalCuFtRow.innerHTML = `<span>Cubic Feet</span><span>${totalCuFt}</span>`;
-    totalsDiv.appendChild(totalCuFtRow);
+  const totalCuFtRow = document.createElement("div");
+  totalCuFtRow.classList.add("totals-row");
+  totalCuFtRow.innerHTML = `<span>Cubic Feet</span><span>${totalCuFt}</span>`;
+  totalsDiv.appendChild(totalCuFtRow);
 
-    const totalMenRow = document.createElement("div");
-    totalMenRow.classList.add("totals-row");
-    totalMenRow.innerHTML = `<span>Men Needed</span><span>${totalMen}</span>`;
-    totalsDiv.appendChild(totalMenRow);
+  const totalMenRow = document.createElement("div");
+  totalMenRow.classList.add("totals-row");
+  totalMenRow.innerHTML = `<span>Men Needed</span><span>${totalMen}</span>`;
+  totalsDiv.appendChild(totalMenRow);
 
-    trailerInfo.forEach(t => {
+  trailerInfo.forEach(t => {
     const trailerRow = document.createElement("div");
     trailerRow.classList.add("totals-row");
     trailerRow.innerHTML = `<span>${t.name} Trips</span><span>${t.trips}</span>`;
     totalsDiv.appendChild(trailerRow);
-    });
+  });
 
-    const totalTimeRow = document.createElement("div");
-    totalTimeRow.classList.add("totals-row");
-    totalTimeRow.innerHTML = `<span>Time</span><span>${formatTime(Math.round(totalEstimatedMinutes))}</span>`;
-    totalsDiv.appendChild(totalTimeRow);
+  const totalTimeRow = document.createElement("div");
+  totalTimeRow.classList.add("totals-row");
+  totalTimeRow.innerHTML = `<span>Time</span><span>${formatTime(Math.round(totalEstimatedMinutes))}</span>`;
+  totalsDiv.appendChild(totalTimeRow);
 
-    const quoteDiv = document.createElement("div");
-    quoteDiv.classList.add("totals-quote");
-    quoteDiv.textContent = `$${quote.toFixed(2)}`;
-    totalsDiv.appendChild(quoteDiv);
-
+  const quoteDiv = document.createElement("div");
+  quoteDiv.classList.add("totals-quote");
+  quoteDiv.textContent = `$${quote.toFixed(2)}`;
+  totalsDiv.appendChild(quoteDiv);
 }
 
 // Initial display
 updateItemsList();
 calculateQuote();
 </script>
+
 
 </body>
 </html>
