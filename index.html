@@ -50,7 +50,7 @@ input, select, button {
     padding: 3px; 
     border-radius: 20px; 
     font-size: 16px; 
-    border: solid #f1f1f1; 
+    border: none; 
     background-color: #f1f1f1;
 }
 
@@ -80,7 +80,7 @@ input::placeholder {
     display: inline-flex;        
     align-items: center;          
     justify-content: center;     
-    padding: 4px 25px;
+    padding: 3px 25px;
     font-size: 16px;
     font-weight: bold;
     text-align: center;
@@ -95,74 +95,6 @@ input::placeholder {
 
 .button-bubble:active {
     background: linear-gradient(145deg, #3a8dff, #6cc1ff); 
-}
-
-#items-list { 
-  box-sizing: border-box;
-  width: 295px; 
-}
-
-.selected-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between; 
-  font-size: 16px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.selected-item .remove-btn {
-  width: 30px;              
-  text-align: left;
-}
-
-.selected-item .item-name {
-  flex: 1;               
-  text-align: center;    
-}
-
-.selected-item .item-quantity {
-  width: 37px;              
-  text-align: right;
-}
-
-
-/* Small bubble button (for "X" remove buttons) */
-.button-bubble-small {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;              
-  height: 16px;             
-  font-size: 12px;
-  font-weight: bold;
-  text-align: center;
-  border: none;
-  border-radius: 20px;       
-  background: linear-gradient(145deg, #ff6c6c, #ff3a3a); 
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-.button-bubble-small:active {
-  background: linear-gradient(145deg, #ff3a3a, #ff6c6c);
-}
-
-.dropdown {
-  position: absolute;
-  top: 34px;
-  width: 305px; 
-  background: #fff;
-  border: 1px solid #ececec;
-  border-radius: 20px;
-  font-size: 16px;
-  max-height: 300px;
-  overflow-y: auto;
-  display: none;
-  z-index: 100;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
 }
 
 .calculate-button {
@@ -182,6 +114,77 @@ input::placeholder {
   transition: all 0.3s ease;
 }
 
+#items-list { 
+    box-sizing: border-box;
+    width: 290px; 
+    margin-bottom: 5px;
+}
+
+.selected-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.selected-item .remove-btn {
+  width: 25px;              
+  text-align: left;
+  /* margin-bottom: 5px; */
+}
+
+.selected-item .item-name {
+  flex: 1;               
+  text-align: center;    
+}
+
+.selected-item .item-quantity {
+  width: 37px;              
+  text-align: right;
+}
+
+
+/* Small bubble button (for "X" remove buttons) */
+.button-bubble-small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;              
+  height: 16px;             
+  font-size: 12px;
+  /* font-weight: bold; */
+  text-align: center;
+  border: none;
+  border-radius: 20px;       
+  background: linear-gradient(145deg, #ff6c6c, #ff3a3a); 
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.button-bubble-small:active {
+  background: linear-gradient(145deg, #ff3a3a, #ff6c6c);
+}
+
+.dropdown {
+  position: absolute;
+  top: 37px;
+  width: 296px; 
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 20px;
+  font-size: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+  z-index: 100;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+
 .totals {
   box-sizing: border-box;
   font-size: 16px;
@@ -192,6 +195,23 @@ input::placeholder {
   border-color: #ffffff;
   background-color: #fff;
   box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
+}
+
+.totals-row {
+  display: flex;
+  justify-content: space-between; 
+  margin-left: 3px;
+  margin-right: 3px;
+  margin-top: 2px;
+  margin-bottom: 5px;
+  font-size: 16px;
+}
+
+.totals-quote {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  margin-top: 10px;
 }
 
 </style>
@@ -486,13 +506,36 @@ function calculateQuote(includeTravel = false) {
   quote = totalEstimatedMinutes * rate / 60;
 
   // Update totals display
-  const totalsDiv = document.getElementById("totals");
-  totalsDiv.innerHTML = 
-    `Total Cubic Feet: ${totalCuFt} 
-    <br> Men Needed: ${totalMen} 
-    <br> ${trailerInfo.map(t => `${t.name}: ${t.trips} trip(s)`).join("<br>")}
-    <br> Total Time: ${formatTime(Math.round(totalEstimatedMinutes))}
-    <br><br><span style="font-size:28px;font-weight:bold;">$${quote.toFixed(2)}</span>`;
+    const totalsDiv = document.getElementById("totals");
+    totalsDiv.innerHTML = "";
+
+    const totalCuFtRow = document.createElement("div");
+    totalCuFtRow.classList.add("totals-row");
+    totalCuFtRow.innerHTML = `<span>Cubic Feet</span><span>${totalCuFt}</span>`;
+    totalsDiv.appendChild(totalCuFtRow);
+
+    const totalMenRow = document.createElement("div");
+    totalMenRow.classList.add("totals-row");
+    totalMenRow.innerHTML = `<span>Men Needed</span><span>${totalMen}</span>`;
+    totalsDiv.appendChild(totalMenRow);
+
+    trailerInfo.forEach(t => {
+    const trailerRow = document.createElement("div");
+    trailerRow.classList.add("totals-row");
+    trailerRow.innerHTML = `<span>${t.name} Trips</span><span>${t.trips}</span>`;
+    totalsDiv.appendChild(trailerRow);
+    });
+
+    const totalTimeRow = document.createElement("div");
+    totalTimeRow.classList.add("totals-row");
+    totalTimeRow.innerHTML = `<span>Time</span><span>${formatTime(Math.round(totalEstimatedMinutes))}</span>`;
+    totalsDiv.appendChild(totalTimeRow);
+
+    const quoteDiv = document.createElement("div");
+    quoteDiv.classList.add("totals-quote");
+    quoteDiv.textContent = `$${quote.toFixed(2)}`;
+    totalsDiv.appendChild(quoteDiv);
+
 }
 
 // Initial display
