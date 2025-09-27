@@ -27,11 +27,12 @@ body {
 
 input, select, button { 
   text-align: center; 
-  width: 300px; 
+  width: 295px; 
   padding: 3px; 
   border-radius: 20px; 
-  font-size: 20px; 
-  border: 2px solid #e8e8e8; 
+  font-size: 16px; 
+  border: solid #ebebeb; 
+  background-color: #ebebeb;
 }
 
 input:focus, select:focus { 
@@ -56,7 +57,7 @@ button {
   align-items: center;           /* vertically center */
   justify-content: center;       /* horizontally center */
   padding: 5px 25px;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   text-align: center;
   border: none;
@@ -79,8 +80,8 @@ button {
   align-items: center;
   justify-content: center;
   width: 30px;              /* fixed small width */
-  height: 20px;             /* fixed height for perfect square bubble */
-  font-size: 16px;
+  height: 18px;             /* fixed height for perfect square bubble */
+  font-size: 14px;
   font-weight: bold;
   text-align: center;
   border: none;
@@ -115,11 +116,12 @@ button {
 /* Dropdown menu */
 .dropdown {
   position: absolute;
-  top: 38px;
+  top: 34px;
   width: 305px; 
   background: #fff;
   border: 1px solid #ececec;
   border-radius: 20px;
+  font-size: 16px;
   max-height: 300px;
   overflow-y: auto;
   display: none;
@@ -148,7 +150,7 @@ button {
   width: 110px;              
   border-radius: 50px;       
   font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
   background: linear-gradient(145deg, #6cc1ff, #3a8dff);
   color: white;
   border: none;
@@ -167,7 +169,7 @@ button {
   padding: 5px;        
   width: 320px;         
   border: solid;
-  border-radius: 8px;
+  border-radius: 20px;
   border-color: #ffffff;
   background-color: #fff;
   box-shadow: 0 1px 5px rgba(0,0,0,0.2);
@@ -179,7 +181,7 @@ button {
   padding: 5px;
   width: 320px;
   border: solid;
-  border-radius: 8px;
+  border-radius: 20px;
   border-color: #ffffff;
   background-color: #fff;
   box-shadow: 0 1px 5px rgba(0,0,0,0.2);
@@ -192,7 +194,7 @@ button {
   padding: 10px;
   width: 320px;
   border: solid;
-  border-radius: 8px;
+  border-radius: 20px;
   border-color: #ffffff;
   background-color: #fff;
   box-shadow: 0 1px 5px rgba(0,0,0,0.2);
@@ -370,6 +372,7 @@ function updateItemsList() {
     itemDiv.style.justifyContent = "center"; 
     itemDiv.style.alignItems = "center"; 
     itemDiv.style.gap = "10px";
+    itemDiv.style.fontSize = "16px";
 
     const text = document.createElement("span"); 
     text.textContent = `${item.name} x${item.quantity}`;
