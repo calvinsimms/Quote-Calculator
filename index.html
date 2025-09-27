@@ -45,7 +45,8 @@ body {
 
 input, select, button { 
     text-align: center; 
-    width: 298px; 
+    margin-top: 5px;
+    width: 290px; 
     padding: 3px; 
     border-radius: 20px; 
     font-size: 16px; 
@@ -67,12 +68,12 @@ input::placeholder {
 
 .small-input {
     flex: 1;
-    max-width: 59px;
+    max-width: 57px;
 }
 
 .small-button {
     flex: 1;
-    max-width: 74px;
+    max-width: 72px;
 }
 
 .button-bubble {
@@ -168,7 +169,8 @@ input::placeholder {
   display: flex;
   align-items: center; 
   justify-content: center;   
-  width: 110px;              
+  width: 110px;  
+  margin-bottom: 5px;            
   border-radius: 50px;       
   font-weight: bold;
   font-size: 16px;
@@ -266,39 +268,46 @@ let selectedItems = [];
 
 // Grab the input box where the user types the item name
 const searchInput = document.getElementById("item-select");
-// Grab the dropdown div (the results box)
 const dropdown = document.getElementById("dropdown");
 
-// When user types into the input box
-searchInput.addEventListener("input", () => {
-  const val = searchInput.value.toLowerCase(); // normalize for case-insensitive search
-  dropdown.innerHTML = ""; // clear old results
+// Function to update dropdown based on current input
+function updateDropdown() {
+  const val = searchInput.value.toLowerCase();
+  dropdown.innerHTML = "";
 
-  // If nothing typed, hide dropdown
-  if (val === "") { 
-    dropdown.style.display = "none"; 
-    return; 
-  }
-
-  // Filter the items that match the typed text
-  itemsList.filter(i => i.toLowerCase().includes(val)).forEach(item => {
-    const div = document.createElement("div");
-    div.textContent = item;
-    div.style.padding = "5px";
-    div.style.cursor = "pointer";
-
-    // When user clicks an item, fill the input and close dropdown
-    div.addEventListener("click", () => { 
-      searchInput.value = item; 
-      dropdown.style.display = "none"; 
+  itemsList
+    .filter(item => item.toLowerCase().includes(val))
+    .forEach(item => {
+      const div = document.createElement("div");
+      div.textContent = item;
+      div.style.padding = "5px";
+      div.style.cursor = "pointer";
+      div.addEventListener("click", () => {
+        searchInput.value = item;
+        dropdown.style.display = "none";
+      });
+      dropdown.appendChild(div);
     });
 
-    dropdown.appendChild(div);
-  });
-
-  // Show dropdown only if there are results
   dropdown.style.display = dropdown.children.length ? "block" : "none";
+}
+
+// Clear input on focus and show full dropdown
+searchInput.addEventListener("focus", () => {
+  searchInput.value = ""; // clear previous value
+  updateDropdown();       // show full list
 });
+
+// Filter as user types
+searchInput.addEventListener("input", updateDropdown);
+
+// Close dropdown if clicking outside
+document.addEventListener("click", (e) => { 
+  if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.style.display = "none"; 
+  }
+});
+
 
 // Show full list on focus (when clicking into the box)
 searchInput.addEventListener("focus", () => {
