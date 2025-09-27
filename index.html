@@ -68,26 +68,27 @@ input::placeholder {
 
 .small-input {
     flex: 1;
-    max-width: 56px;
+    width: 55px;
 }
 
 .small-button {
     flex: 1;
-    max-width: 71px;
+    width: 40px;
 }
 
 .button-bubble {
     display: inline-flex;        
     align-items: center;          
     justify-content: center;     
-    padding: 5px 25px;
-    font-size: 16px;
-    font-weight: bold;
+    /* padding: 5px 25px; */
+    font-size: 25px;
+    height: 30px;
+    /* font-weight: bold; */
     text-align: center;
     border: none;
-    border-radius: 50px;
+    /* border-radius: 50px; */
     background: linear-gradient(145deg, #6cc1ff, #3a8dff);
-    color: white;
+    color: rgb(255, 255, 255);
     cursor: pointer;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
@@ -101,7 +102,7 @@ input::placeholder {
   display: flex;
   align-items: center; 
   justify-content: center;   
-  width: 110px;  
+  width: 100px;  
   margin-bottom: 5px;            
   border-radius: 50px;       
   font-weight: bold;
@@ -173,7 +174,7 @@ input::placeholder {
   position: absolute;
   top: 49px;
   width: 301px; 
-  max-height: 354px;
+  max-height: 250px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 25px;
   font-size: 16px;
@@ -247,7 +248,7 @@ input::placeholder {
     <div id="dropdown" class="dropdown"></div>
     <div style="display:flex; align-items:center; gap:5px; justify-content:center;">
         <input type="number" id="item-quantity" value="1" min="1" class="small-input">
-        <button id="add-item" class="small-button button-bubble">Add</button>
+        <button id="add-item" class="small-button button-bubble">+</button>
     </div>
     <div id="items-list"></div>
 </div>
