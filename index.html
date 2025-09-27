@@ -25,140 +25,6 @@ body {
   background-color: #f5f5f5;
 }
 
-input, select, button { 
-  text-align: center; 
-  width: 295px; 
-  padding: 5px; 
-  border-radius: 20px; 
-  font-size: 16px; 
-  border: solid #f1f1f1; 
-  background-color: #f1f1f1;
-}
-
-input:focus, select:focus { 
-  border-color: #007BFF; 
-  box-shadow: 0 1px 5px rgba(58, 141, 255, 0.3);
-  outline: none; 
-}
-
-input::placeholder {
-  color: #a4a4a4;          /* your desired color */
-  font-style: italic;   /* optional: make it italic */
-  opacity: 1;           /* ensures color shows in all browsers */
-}
-
-button { 
-  cursor: pointer; 
-}
-
-/* Base bubble button */
-.button-bubble {
-  display: inline-flex;          /* makes the button a flex container */
-  align-items: center;           /* vertically center */
-  justify-content: center;       /* horizontally center */
-  padding: 5px 25px;
-  font-size: 16px;
-  font-weight: bold;
-  text-align: center;
-  border: none;
-  border-radius: 50px;
-  background: linear-gradient(145deg, #6cc1ff, #3a8dff);
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-/* Active effect */
-.button-bubble:active {
-  background: linear-gradient(145deg, #3a8dff, #6cc1ff); 
-}
-
-/* Small bubble button (for "X" remove buttons) */
-.button-bubble-small {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;              /* fixed small width */
-  height: 18px;             /* fixed height for perfect square bubble */
-  font-size: 14px;
-  font-weight: bold;
-  text-align: center;
-  border: none;
-  border-radius: 20px;       /* circular bubble */
-  background: linear-gradient(145deg, #ff6c6c, #ff3a3a); /* red gradient */
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-.button-bubble-small:active {
-  background: linear-gradient(145deg, #ff3a3a, #ff6c6c);
-}
-
-/* ==========================
-   Sections
-   ========================== */
-.quote { 
-  margin-top: 10px; 
-  font-weight: bold; 
-  font-size: 23px; 
-}
-
-/* Row layout (side by side inputs/buttons) */
-.row {
-  display: flex;
-  gap: 5px;
-  justify-content: center;
-}
-
-/* Dropdown menu */
-.dropdown {
-  position: absolute;
-  top: 34px;
-  width: 305px; 
-  background: #fff;
-  border: 1px solid #ececec;
-  border-radius: 20px;
-  font-size: 16px;
-  max-height: 300px;
-  overflow-y: auto;
-  display: none;
-  z-index: 100;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-}
-
-/* Small input (like quantity) */
-.small-input {
-  flex: 1;
-  max-width: 50px;
-}
-
-/* Small button */
-.small-button {
-  flex: 1;
-  max-width: 65px;
-
-}
-
-/* Calculate button */
-.calculate-button {
-  display: flex;
-  align-items: center; 
-  justify-content: center;   
-  width: 110px;              
-  border-radius: 50px;       
-  font-weight: bold;
-  font-size: 16px;
-  background: linear-gradient(145deg, #6cc1ff, #3a8dff);
-  color: white;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.2);
-  transition: all 0.3s ease;
-}
-
 .input-container {
   box-sizing: border-box;
   margin-bottom: 10px;
@@ -176,22 +42,147 @@ button {
   box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
 }
 
+
+input, select, button { 
+    text-align: center; 
+    width: 298px; 
+    padding: 3px; 
+    border-radius: 20px; 
+    font-size: 16px; 
+    border: solid #f1f1f1; 
+    background-color: #f1f1f1;
+}
+
+input:focus, select:focus { 
+    border-color: #007BFF; 
+    box-shadow: 0 1px 5px rgba(58, 141, 255, 0.3);
+    outline: none; 
+}
+
+input::placeholder {
+    color: #a4a4a4;      
+    font-style: italic;   
+    opacity: 1;          
+}
+
+.small-input {
+    flex: 1;
+    max-width: 59px;
+}
+
+.small-button {
+    flex: 1;
+    max-width: 74px;
+}
+
+.button-bubble {
+    display: inline-flex;        
+    align-items: center;          
+    justify-content: center;     
+    padding: 4px 25px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(145deg, #6cc1ff, #3a8dff);
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.button-bubble:active {
+    background: linear-gradient(145deg, #3a8dff, #6cc1ff); 
+}
+
 #items-list { 
   box-sizing: border-box;
-  /* margin: 10px; 
-  padding: 5px; */
-  /* width: 320px; */
-  /* border: solid;
+  width: 295px; 
+}
+
+.selected-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+  font-size: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.selected-item .remove-btn {
+  width: 30px;              
+  text-align: left;
+}
+
+.selected-item .item-name {
+  flex: 1;               
+  text-align: center;    
+}
+
+.selected-item .item-quantity {
+  width: 37px;              
+  text-align: right;
+}
+
+
+/* Small bubble button (for "X" remove buttons) */
+.button-bubble-small {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;              
+  height: 16px;             
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 20px;       
+  background: linear-gradient(145deg, #ff6c6c, #ff3a3a); 
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.button-bubble-small:active {
+  background: linear-gradient(145deg, #ff3a3a, #ff6c6c);
+}
+
+.dropdown {
+  position: absolute;
+  top: 34px;
+  width: 305px; 
+  background: #fff;
+  border: 1px solid #ececec;
   border-radius: 20px;
-  border-color: #ffffff;
-  background-color: #fff; */
-  /* box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2); */
+  font-size: 16px;
+  max-height: 300px;
+  overflow-y: auto;
+  display: none;
+  z-index: 100;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+.calculate-button {
+  display: flex;
+  align-items: center; 
+  justify-content: center;   
+  width: 110px;              
+  border-radius: 50px;       
+  font-weight: bold;
+  font-size: 16px;
+  background: linear-gradient(145deg, #6cc1ff, #3a8dff);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
 }
 
 .totals {
   box-sizing: border-box;
   font-size: 16px;
-
   padding: 10px;
   width: 320px;
   border: solid;
@@ -215,13 +206,15 @@ button {
 
 <!-- Item input fields -->
 <div id="item-inputs" class="input-container">
-  <input type="text" id="item-select" placeholder="select item..." autocomplete="off">
-  <div id="dropdown" class="dropdown"></div>
-  <div class="row">
-    <input type="number" id="item-quantity" placeholder="#" min="1" class="small-input">
-    <button id="add-item" class="small-button button-bubble">Add</button>
-  </div>
-  <div id="items-list"></div>
+    <input type="text" id="item-select" placeholder="select item..." autocomplete="off">
+    <div id="dropdown" class="dropdown"></div>
+    <div style="display:flex; align-items:center; gap:5px; justify-content:center;">
+        <input type="number" id="item-quantity" value="1" min="1" class="small-input">
+        <button id="decrement" class="small-button button-bubble">-</button>
+        <button id="increment" class="small-button button-bubble">+</button>
+        <button id="add-item" class="small-button button-bubble">Add</button>
+    </div>
+    <div id="items-list"></div>
 </div>
 
 
@@ -337,26 +330,39 @@ document.addEventListener("click", (e) => {
 // ADDING ITEMS TO LIST
 // ==========================
 
+// Increment and Decrement buttons
+document.getElementById("increment").addEventListener("click", () => {
+  let qtyInput = document.getElementById("item-quantity");
+  qtyInput.value = parseInt(qtyInput.value || 1) + 1;
+});
+
+document.getElementById("decrement").addEventListener("click", () => {
+  let qtyInput = document.getElementById("item-quantity");
+  let current = parseInt(qtyInput.value || 1);
+  if (current > 1) qtyInput.value = current - 1; // Prevent going below 1
+});
+
+
 document.getElementById("add-item").addEventListener("click", () => {
-  let itemName = searchInput.value.trim(); // get name from input
+  let itemName = searchInput.value.trim(); 
   let quantity = parseInt(document.getElementById("item-quantity").value) || 0;
 
-  // Only add valid items with quantity > 0
   if (quantity > 0 && itemsData[itemName]) {
-    // If item already exists in list, increase its quantity
     let existing = selectedItems.find(i => i.name === itemName);
-    if (existing) existing.quantity += quantity;
-    else selectedItems.push({ name: itemName, quantity: quantity });
+    if (existing) {
+      existing.quantity += quantity;
+    } else {
+      selectedItems.push({ name: itemName, quantity: quantity });
+    }
 
-    // Clear input fields
-    document.getElementById("item-quantity").value = ''; 
-    searchInput.value = '';
+    // Reset only quantity back to 1, but keep the item name
+    document.getElementById("item-quantity").value = 1;
 
-    // Update display + recalculate
     updateItemsList(); 
     calculateQuote();
   }
 });
+
 
 // ==========================
 // UPDATE SELECTED ITEMS LIST
@@ -364,37 +370,44 @@ document.getElementById("add-item").addEventListener("click", () => {
 
 function updateItemsList() {
   const listDiv = document.getElementById("items-list");
-  listDiv.innerHTML = "<strong>Selected Items</strong><br>";
+  listDiv.innerHTML = ""; 
 
-  // Loop through selected items and display them with a remove button
   selectedItems.forEach((item, index) => {
     const itemDiv = document.createElement("div");
-    itemDiv.style.display = "flex"; 
-    itemDiv.style.justifyContent = "center"; 
-    itemDiv.style.gap = "10px";
-    itemDiv.style.fontSize = "16px";
+    itemDiv.classList.add("selected-item");
 
-    const text = document.createElement("span"); 
-    text.textContent = `${item.name} x${item.quantity}`;
-
-    // Create remove button ("X")
-    const removeBtn = document.createElement("button"); 
-    removeBtn.textContent = "X"; 
-    removeBtn.classList.add("button-bubble-small");
-
-
-    // When clicked, remove this item and recalculate
+    // Remove button (left)
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "X";
+    removeBtn.classList.add("button-bubble-small", "remove-btn");
     removeBtn.addEventListener("click", () => { 
       selectedItems.splice(index, 1); 
       updateItemsList(); 
       calculateQuote(); 
     });
 
-    itemDiv.appendChild(text); 
-    itemDiv.appendChild(removeBtn); 
+    // Item name (center)
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = item.name;
+    nameSpan.classList.add("item-name");
+
+    // Quantity (right)
+    const qtySpan = document.createElement("span");
+    qtySpan.textContent = `${item.quantity}`;
+    qtySpan.classList.add("item-quantity");
+
+    // Append in order: remove | name | quantity
+    itemDiv.appendChild(removeBtn);
+    itemDiv.appendChild(nameSpan);
+    itemDiv.appendChild(qtySpan);
+
     listDiv.appendChild(itemDiv);
   });
 }
+
+
+
+
 
 // ==========================
 // HELPER: FORMAT TIME
