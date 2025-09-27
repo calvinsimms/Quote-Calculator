@@ -31,9 +31,9 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;   
-  gap: 5px;
+  gap: 10px;
   position: relative;
-  padding: 5px;        
+  padding: 10px;        
   width: 320px;         
   border: solid;
   border-radius: 25px;
@@ -45,7 +45,6 @@ body {
 
 input, select, button { 
     text-align: center; 
-    margin-top: 5px;
     width: 285px; 
     padding: 6px; 
     border-radius: 20px; 
@@ -100,7 +99,6 @@ input::placeholder {
   align-items: center; 
   justify-content: center;   
   width: 100px;  
-  margin-bottom: 5px;            
   border-radius: 50px;       
   font-weight: bold;
   font-size: 16px;
@@ -112,11 +110,18 @@ input::placeholder {
   transition: all 0.3s ease;
 }
 
-#items-list { 
-    box-sizing: border-box;
-    width: 290px; 
-    margin-bottom: 5px;
+#items-list {
+  box-sizing: border-box;
+  width: 290px;
+  display: flex;          
+  flex-direction: column; 
+  gap: 5px;               
 }
+
+#items-list:empty {
+  display: none;
+}
+
 
 .selected-item {
   display: flex;
@@ -237,11 +242,11 @@ input::placeholder {
 
 <!-- Item input fields -->
 <div id="item-inputs" class="input-container">
-    <div style="display: flex; width: 100%; align-items: center; gap: 5px; margin-left: 10px;">
+    <div style="display: flex; width: 298px; align-items: center; gap: 5px;">
         <!-- Item select -->
         <input type="text" id="item-select" placeholder="select item..." autocomplete="off" style="flex: 1;">
         <!-- Quantity + Add button -->
-        <div style="display: flex; gap: 5px; align-items: center; margin-right: 10px;">
+        <div style="display: flex; gap: 5px; align-items: center;">
             <input type="number" id="item-quantity" value="1" min="1" class="small-input">
             <button id="add-item" class="small-button button-bubble">+</button>
         </div>
