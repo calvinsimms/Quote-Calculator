@@ -247,8 +247,6 @@ input::placeholder {
     <div id="dropdown" class="dropdown"></div>
     <div style="display:flex; align-items:center; gap:5px; justify-content:center;">
         <input type="number" id="item-quantity" value="1" min="1" class="small-input">
-        <button id="decrement" class="small-button button-bubble">-</button>
-        <button id="increment" class="small-button button-bubble">+</button>
         <button id="add-item" class="small-button button-bubble">Add</button>
     </div>
     <div id="items-list"></div>
@@ -345,19 +343,6 @@ document.addEventListener("click", (e) => {
 // ==========================
 // ADDING ITEMS TO LIST
 // ==========================
-
-// Increment and Decrement buttons
-document.getElementById("increment").addEventListener("click", () => {
-  let qtyInput = document.getElementById("item-quantity");
-  qtyInput.value = parseInt(qtyInput.value || 1) + 1;
-});
-
-document.getElementById("decrement").addEventListener("click", () => {
-  let qtyInput = document.getElementById("item-quantity");
-  let current = parseInt(qtyInput.value || 1);
-  if (current > 1) qtyInput.value = current - 1; // Prevent going below 1
-});
-
 
 document.getElementById("add-item").addEventListener("click", () => {
   let itemName = searchInput.value.trim(); 
