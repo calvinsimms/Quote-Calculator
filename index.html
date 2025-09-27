@@ -8,7 +8,7 @@
 
 h1 { 
   font-family: "Brush Script MT", cursive; 
-  font-size: 45px; 
+  font-size: 40px; 
   margin-bottom: 0px;
   margin-top: 0px; 
 }
@@ -21,7 +21,7 @@ body {
   margin: 0; 
   padding: 0px; 
   text-align: center; 
-  font-size: 20px;
+  font-size: 18px;
   background-color: #f5f5f5;
 }
 
@@ -161,6 +161,7 @@ button {
 
 .input-container {
   box-sizing: border-box;
+  margin-bottom: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;   
@@ -177,20 +178,20 @@ button {
 
 #items-list { 
   box-sizing: border-box;
-  margin: 10px; 
-  padding: 5px;
-  width: 320px;
-  border: solid;
+  /* margin: 10px; 
+  padding: 5px; */
+  /* width: 320px; */
+  /* border: solid;
   border-radius: 20px;
   border-color: #ffffff;
-  background-color: #fff;
-  box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
+  background-color: #fff; */
+  /* box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2); */
 }
 
 .totals {
   box-sizing: border-box;
   font-size: 16px;
-  margin-top: 10px;
+
   padding: 10px;
   width: 320px;
   border: solid;
@@ -220,12 +221,12 @@ button {
     <input type="number" id="item-quantity" placeholder="#" min="1" class="small-input">
     <button id="add-item" class="small-button button-bubble">Add</button>
   </div>
+  <div id="items-list"></div>
 </div>
 
-<div id="items-list"></div>
 
 <!-- Load and Unload (destination) addresses -->
-<div id="unload-input" class="input-container" style="padding-top: 5px;">
+<div id="unload-input" class="input-container">
   <input 
     type="text" 
     id="load-address" 
