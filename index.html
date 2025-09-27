@@ -31,8 +31,8 @@ input, select, button {
   padding: 3px; 
   border-radius: 20px; 
   font-size: 16px; 
-  border: solid #ebebeb; 
-  background-color: #ebebeb;
+  border: solid #f1f1f1; 
+  background-color: #f1f1f1;
 }
 
 input:focus, select:focus { 
@@ -42,7 +42,7 @@ input:focus, select:focus {
 }
 
 input::placeholder {
-  color: #b9b9b9;          /* your desired color */
+  color: #a4a4a4;          /* your desired color */
   font-style: italic;   /* optional: make it italic */
   opacity: 1;           /* ensures color shows in all browsers */
 }
@@ -172,7 +172,7 @@ button {
   border-radius: 20px;
   border-color: #ffffff;
   background-color: #fff;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
 }
 
 #items-list { 
@@ -184,7 +184,7 @@ button {
   border-radius: 20px;
   border-color: #ffffff;
   background-color: #fff;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
 }
 
 .totals {
@@ -197,7 +197,7 @@ button {
   border-radius: 20px;
   border-color: #ffffff;
   background-color: #fff;
-  box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
 }
 
 </style>
@@ -214,7 +214,7 @@ button {
 
 <!-- Item input fields -->
 <div id="item-inputs" class="input-container">
-  <input type="text" id="item-select" placeholder="Select item" autocomplete="off">
+  <input type="text" id="item-select" placeholder="select item..." autocomplete="off">
   <div id="dropdown" class="dropdown"></div>
   <div class="row">
     <input type="number" id="item-quantity" placeholder="#" min="1" class="small-input">
@@ -229,12 +229,12 @@ button {
   <input 
     type="text" 
     id="unload-address" 
-    placeholder="Enter unload address" 
+    placeholder="unload address..." 
     autocomplete="off">
   <input 
     type="text" 
     id="load-address" 
-    placeholder="Enter load address" 
+    placeholder="load address..." 
     autocomplete="off">
   <button id="calculate-route" class="calculate-button button-bubble">Calculate</button>
 </div>
