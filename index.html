@@ -315,32 +315,48 @@ async function loadItemsData() {
 }
 
 // ------------------------ Dropdown logic ------------------------
+// ------------------------ Autocomplete & Dropdown ------------------------
 const searchInput = document.getElementById("item-select");
 const dropdown = document.getElementById("dropdown");
 
-function updateDropdown() {
-  const val = searchInput.value.toLowerCase().trim();
+// Show dropdown when input is focused
+searchInput.addEventListener("focus", () => {
+  updateDropdown(""); // pass empty string to show all items
+});
+
+// Update dropdown on typing
+searchInput.addEventListener("input", () => {
+  updateDropdown(searchInput.value);
+});
+
+// Hide dropdown when clicking outside
+document.addEventListener("click", e => { 
+  if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.style.display = "none";
+  }
+});
+
+// Update dropdown function
+function updateDropdown(filterValue) {
+  const val = filterValue.toLowerCase().trim();
   dropdown.innerHTML = "";
 
-  if (!val) {
-    dropdown.style.display = "none";
-    return;
-  }
+  let matches = itemsList.filter(item => item.toLowerCase().includes(val));
 
-  itemsList.filter(item => item.toLowerCase().includes(val))
-    .forEach(item => {
-      const div = document.createElement("div");
-      div.classList.add("dropdown-item");
-      div.textContent = item;
-      div.addEventListener("click", () => { 
-        searchInput.value = item; 
-        dropdown.style.display = "none"; 
-      });
-      dropdown.appendChild(div);
+  matches.forEach(item => {
+    const div = document.createElement("div");
+    div.classList.add("dropdown-item");
+    div.textContent = item;
+    div.addEventListener("click", () => { 
+      searchInput.value = item; 
+      dropdown.style.display = "none"; 
     });
+    dropdown.appendChild(div);
+  });
 
-  dropdown.style.display = dropdown.children.length ? "block" : "none";
+  dropdown.style.display = matches.length ? "block" : "none";
 }
+
 
 // Attach events after itemsList is loaded
 function attachDropdownEvents() {
