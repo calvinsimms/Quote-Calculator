@@ -335,10 +335,13 @@ function updateDropdown(filterValue) {
   dropdown.style.display = matches.length ? "block" : "none";
 }
 
-// Show dropdown on focus
-searchInput.addEventListener("focus", () => updateDropdown(searchInput.value));
+// Show dropdown on focus and clear input (keep original behavior)
+searchInput.addEventListener("focus", () => {
+    searchInput.value = "";  
+    if (itemsList.length > 0) updateDropdown("");     
+});
 
-// Update dropdown on input
+// Update dropdown on typing
 searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
 
 // Hide dropdown if clicking outside
@@ -361,6 +364,7 @@ document.getElementById("add-item").addEventListener("click", () => {
         selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
 
+    // Do NOT reset searchInput or quantityInput here (keeps user behavior intact)
     updateItemsList();
     calculateQuote();
   }
