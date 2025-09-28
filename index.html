@@ -296,40 +296,61 @@ async function loadItemsData() {
   const text = await response.text();
   const json = JSON.parse(text.substring(47).slice(0, -2));
 
+  // Normalize item names: trim and lowercase for matching
   json.table.rows.forEach(row => {
     let itemName = row.c[0]?.v?.trim();
     const cubicFeet = row.c[1]?.v;
     if(itemName && cubicFeet){
-      itemsData[itemName.toLowerCase()] = { name: itemName, cubicFeet };
+      itemsData[itemName.toLowerCase()] = { name: itemName, cubicFeet }; // store original name
     }
   });
 
-  itemsList = Object.values(itemsData).map(i => i.name);
+  itemsList = Object.values(itemsData).map(i => i.name); // original names for dropdown
 
-  // Only now attach dropdown events
+  // After data is loaded, attach event listeners to ensure dropdown works
   attachDropdownEvents();
 
   updateItemsList();
-  calculateQuote(); 
+  calculateQuote(); // initial totals
 }
 
 // ------------------------ Dropdown logic ------------------------
+// ------------------------ Autocomplete & Dropdown ------------------------
 const searchInput = document.getElementById("item-select");
 const dropdown = document.getElementById("dropdown");
 
+// Show dropdown when input is focused
+searchInput.addEventListener("focus", () => {
+    searchInput.value = "";  
+    updateDropdown("");     
+});
+
+// Update dropdown on typing
+searchInput.addEventListener("input", () => {
+  updateDropdown(searchInput.value);
+});
+
+// Hide dropdown when clicking outside
+document.addEventListener("click", e => { 
+  if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.style.display = "none";
+  }
+});
+
+// Update dropdown function
 function updateDropdown(filterValue) {
   const val = filterValue.toLowerCase().trim();
   dropdown.innerHTML = "";
 
-  const matches = itemsList.filter(item => item.toLowerCase().includes(val));
+  let matches = itemsList.filter(item => item.toLowerCase().includes(val));
 
   matches.forEach(item => {
     const div = document.createElement("div");
     div.classList.add("dropdown-item");
     div.textContent = item;
-    div.addEventListener("click", () => {
-      searchInput.value = item;
-      dropdown.style.display = "none";
+    div.addEventListener("click", () => { 
+      searchInput.value = item; 
+      dropdown.style.display = "none"; 
     });
     dropdown.appendChild(div);
   });
@@ -337,38 +358,43 @@ function updateDropdown(filterValue) {
   dropdown.style.display = matches.length ? "block" : "none";
 }
 
+
+// Attach events after itemsList is loaded
 function attachDropdownEvents() {
-  // Show all items on focus
-  searchInput.addEventListener("focus", () => updateDropdown(""));
+  searchInput.addEventListener("focus", updateDropdown);
+  searchInput.addEventListener("input", updateDropdown);
 
-  // Filter items on input
-  searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
-
-  // Hide dropdown when clicking outside
-  document.addEventListener("click", e => {
-    if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+  document.addEventListener("click", e => { 
+    if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
       dropdown.style.display = "none";
     }
   });
 }
 
+const quantityInput = document.getElementById("item-quantity");
+
+quantityInput.addEventListener("focus", () => {
+    quantityInput.value = "";
+});
+
 // ------------------------ Add Item ------------------------
 document.getElementById("add-item").addEventListener("click", () => {
-  const inputName = searchInput.value.trim().toLowerCase();
-  const quantity = parseInt(document.getElementById("item-quantity").value) || 0;
+    const inputName = searchInput.value.trim().toLowerCase();
+    const quantity = parseInt(quantityInput.value) || 0;
 
-  if(quantity > 0 && itemsData[inputName]){
-    let existing = selectedItems.find(i => i.name.toLowerCase() === inputName);
-    if(existing){
-      existing.quantity += quantity;
-    } else {
-      selectedItems.push({ name: itemsData[inputName].name, quantity });
+    if(quantity > 0 && itemsData[inputName]){
+        let existing = selectedItems.find(i => i.name.toLowerCase() === inputName);
+        if(existing){ 
+            existing.quantity += quantity; 
+        } else { 
+            selectedItems.push({ name: itemsData[inputName].name, quantity });
+        }
+        quantityInput.value = 1; // reset after adding
+        updateItemsList();
+        calculateQuote();
     }
-    document.getElementById("item-quantity").value = 1;
-    updateItemsList();
-    calculateQuote();
-  }
 });
+
 
 // ------------------------ Update Items List ------------------------
 function updateItemsList(){
@@ -459,7 +485,8 @@ function calculateQuote(includeTravel=false){
 document.getElementById("calculate-route").addEventListener("click",()=>calculateQuote(true));
 
 // ------------------------ Initial Display ------------------------
-loadItemsData(); // <-- important: wait for items to load before enabling dropdown
+updateItemsList();
+calculateQuote();
 </script>
 
 </body>
