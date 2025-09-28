@@ -342,6 +342,8 @@ function updateDropdown(filterValue) {
 
   let matches = itemsList.filter(item => item.toLowerCase().includes(val));
 
+  matches.sort((a, b) => a.localeCompare(b));
+
   matches.forEach(item => {
     const div = document.createElement("div");
     div.classList.add("dropdown-item");
@@ -472,10 +474,11 @@ function calculateQuote(includeTravel=false){
   const avgTrailerSize = 710;
   const baseTimePerFullTrailer = 150;  
   let crewFactor = 1.0;
-  if (numMen === 3 || numMen === 4) crewFactor = 1.2;
+  if (numMen === 3) crewFactor = 0.8;
+  if (numMen === 4) crewFactor = 0.6;
 
   const trailerEquivalents = totalCuFt / avgTrailerSize;
-  const totalLoadTime = baseTimePerFullTrailer * trailerEquivalents * (2 / numMen) * crewFactor;
+  const totalLoadTime = baseTimePerFullTrailer * trailerEquivalents * crewFactor;
 
   if (includeTravel) {
     const userTravel = parseInt(document.getElementById("travel-minutes")?.value);
@@ -498,7 +501,6 @@ function calculateQuote(includeTravel=false){
   `;
 }
 
-
 document.getElementById("calculate-route").addEventListener("click", () => calculateQuote(true));
 
 // ------------------------ Initial Display ------------------------
@@ -506,7 +508,6 @@ loadItemsData();
 updateItemsList();
 calculateQuote();
 </script>
-
 
 </body>
 </html>
