@@ -289,6 +289,10 @@ let itemsList = [];
 let selectedItems = [];
 let numMen = 2; // Default crew size
 
+const searchInput = document.getElementById("item-select");
+const dropdown = document.getElementById("dropdown");
+const quantityInput = document.getElementById("item-quantity");
+
 // ------------------------ Load Google Sheets data ------------------------
 async function loadItemsData() {
   const url = "https://docs.google.com/spreadsheets/d/1cW3RxxxLof_CcXueLCtNfYNqXnrCeAzfHnALnE82ihk/gviz/tq?tqx=out:json&sheet=Sheet1";
@@ -296,42 +300,21 @@ async function loadItemsData() {
   const text = await response.text();
   const json = JSON.parse(text.substring(47).slice(0, -2));
 
-  // Normalize item names: trim and lowercase for matching
   json.table.rows.forEach(row => {
     let itemName = row.c[0]?.v?.trim();
     const cubicFeet = row.c[1]?.v;
     if(itemName && cubicFeet){
-      itemsData[itemName.toLowerCase()] = { name: itemName, cubicFeet }; // store original name
+      itemsData[itemName.toLowerCase()] = { name: itemName, cubicFeet };
     }
   });
 
-  itemsList = Object.values(itemsData).map(i => i.name); // original names for dropdown
-
-  // After data is loaded, attach event listeners to ensure dropdown works
-  attachDropdownEvents();
+  itemsList = Object.values(itemsData).map(i => i.name);
 
   updateItemsList();
-  calculateQuote(); // initial totals
+  calculateQuote();
 }
 
 // ------------------------ Dropdown logic ------------------------
-// ------------------------ Autocomplete & Dropdown ------------------------
-const searchInput = document.getElementById("item-select");
-const dropdown = document.getElementById("dropdown");
-
-// Update dropdown on typing
-searchInput.addEventListener("input", () => {
-  updateDropdown(searchInput.value);
-});
-
-// Hide dropdown when clicking outside
-document.addEventListener("click", e => { 
-  if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-    dropdown.style.display = "none";
-  }
-});
-
-// Update dropdown function
 function updateDropdown(filterValue) {
   const val = filterValue.toLowerCase().trim();
   dropdown.innerHTML = "";
@@ -352,45 +335,36 @@ function updateDropdown(filterValue) {
   dropdown.style.display = matches.length ? "block" : "none";
 }
 
+// Show dropdown on focus
+searchInput.addEventListener("focus", () => updateDropdown(searchInput.value));
 
-// Attach events after itemsList is loaded
-// ------------------------ Attach events after itemsList is loaded ------------------------
-function attachDropdownEvents() {
-  // Input listener for typing
-  searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
+// Update dropdown on input
+searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
 
-  // Hide dropdown when clicking outside
-  document.addEventListener("click", e => { 
-    if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.style.display = "none";
-    }
-  });
-}
-
-searchInput.addEventListener("focus", () => {
-    searchInput.value = "";  
-    if (itemsList.length > 0) updateDropdown("");     
+// Hide dropdown if clicking outside
+document.addEventListener("click", e => { 
+  if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.style.display = "none";
+  }
 });
-
 
 // ------------------------ Add Item ------------------------
 document.getElementById("add-item").addEventListener("click", () => {
-    const inputName = searchInput.value.trim().toLowerCase();
-    const quantity = parseInt(quantityInput.value) || 0;
+  const inputName = searchInput.value.trim().toLowerCase();
+  const quantity = parseInt(quantityInput.value) || 0;
 
-    if(quantity > 0 && itemsData[inputName]){
-        let existing = selectedItems.find(i => i.name.toLowerCase() === inputName);
-        if(existing){ 
-            existing.quantity += quantity; 
-        } else { 
-            selectedItems.push({ name: itemsData[inputName].name, quantity });
-        }
-        quantityInput.value = 1; // reset after adding
-        updateItemsList();
-        calculateQuote();
+  if(quantity > 0 && itemsData[inputName]){
+    let existing = selectedItems.find(i => i.name.toLowerCase() === inputName);
+    if(existing){ 
+        existing.quantity += quantity; 
+    } else { 
+        selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
-});
 
+    updateItemsList();
+    calculateQuote();
+  }
+});
 
 // ------------------------ Update Items List ------------------------
 function updateItemsList(){
@@ -481,10 +455,10 @@ function calculateQuote(includeTravel=false){
 document.getElementById("calculate-route").addEventListener("click",()=>calculateQuote(true));
 
 // ------------------------ Initial Display ------------------------
+loadItemsData();
 updateItemsList();
 calculateQuote();
 </script>
 
 </body>
 </html>
-
