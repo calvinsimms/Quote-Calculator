@@ -319,12 +319,6 @@ async function loadItemsData() {
 const searchInput = document.getElementById("item-select");
 const dropdown = document.getElementById("dropdown");
 
-// Show dropdown when input is focused
-searchInput.addEventListener("focus", () => {
-    searchInput.value = "";  
-    updateDropdown("");     
-});
-
 // Update dropdown on typing
 searchInput.addEventListener("input", () => {
   updateDropdown(searchInput.value);
@@ -360,10 +354,12 @@ function updateDropdown(filterValue) {
 
 
 // Attach events after itemsList is loaded
+// ------------------------ Attach events after itemsList is loaded ------------------------
 function attachDropdownEvents() {
-  searchInput.addEventListener("focus", updateDropdown);
-  searchInput.addEventListener("input", updateDropdown);
+  // Input listener for typing
+  searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
 
+  // Hide dropdown when clicking outside
   document.addEventListener("click", e => { 
     if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
       dropdown.style.display = "none";
@@ -371,11 +367,11 @@ function attachDropdownEvents() {
   });
 }
 
-const quantityInput = document.getElementById("item-quantity");
-
-quantityInput.addEventListener("focus", () => {
-    quantityInput.value = "";
+searchInput.addEventListener("focus", () => {
+    searchInput.value = "";  
+    if (itemsList.length > 0) updateDropdown("");     
 });
+
 
 // ------------------------ Add Item ------------------------
 document.getElementById("add-item").addEventListener("click", () => {
@@ -491,3 +487,4 @@ calculateQuote();
 
 </body>
 </html>
+
