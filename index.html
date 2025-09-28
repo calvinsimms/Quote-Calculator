@@ -264,7 +264,6 @@ input::placeholder {
     
 <h1>Quote Calculator</h1>
 
-<!-- Item input fields -->
 <div id="item-inputs" class="input-container">
     <div style="display: flex; width: 100%; align-items: center; gap: 5px;">
         <input type="text" id="item-select" placeholder="select item..." autocomplete="off" style="flex: 1;">
@@ -309,7 +308,7 @@ input::placeholder {
 let itemsData = {}; 
 let itemsList = [];
 let selectedItems = [];
-let numMen = 2; // Default crew size
+let numMen = 2;
 
 const searchInput = document.getElementById("item-select");
 const dropdown = document.getElementById("dropdown");
@@ -357,7 +356,7 @@ function updateDropdown(filterValue) {
   dropdown.style.display = matches.length ? "block" : "none";
 }
 
-// Show dropdown on focus and clear input (keep original behavior)
+// Show dropdown on focus and clear input
 searchInput.addEventListener("focus", () => {
     searchInput.value = "";  
     if (itemsList.length > 0) updateDropdown("");     
@@ -386,7 +385,6 @@ document.getElementById("add-item").addEventListener("click", () => {
         selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
 
-    // Do NOT reset searchInput or quantityInput here (keeps user behavior intact)
     updateItemsList();
     calculateQuote();
   }
@@ -446,7 +444,7 @@ document.querySelectorAll(".crew-btn").forEach(btn => {
   });
 });
 
-let selectedTrailer = "S"; // Default trailer size (S or L)
+let selectedTrailer = "S"; 
 
 // ------------------------ Trailer Button Logic ------------------------
 document.querySelectorAll(".trailer-btn").forEach(btn => {
@@ -454,54 +452,43 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
     document.querySelectorAll(".trailer-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     selectedTrailer = btn.dataset.trailer;
-    calculateQuote(); // recalc when trailer changes
+    calculateQuote(); 
   });
 });
 
 // ------------------------ Calculate Quote ------------------------
 function calculateQuote(includeTravel=false){
-  let totalCuFt = 0, quote = 0, travelMinutes = 30; // default travel per trip
+  let totalCuFt = 0, quote = 0, travelMinutes = 30;
 
-  // Sum total cubic feet
   selectedItems.forEach(i => {
     totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity;
   });
 
-  // -------------------
-  // Trailer info for display
-  // -------------------
   const trailerSizes = { S: 670, L: 750 };
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
   const trips = Math.ceil(totalCuFt / trailerCapacity);
   const trailerUsagePercent = Math.min((totalCuFt / trailerCapacity) * 100, 100);
 
-  // -------------------
-  // Continuous load time
-  // -------------------
-  const timePerCuFt = 1.0; // minutes per cubic foot for 1 person
-  const totalTime = totalCuFt > 0 ? (totalCuFt * timePerCuFt) / numMen : 0;
+  const baseTimePerFullTrailer = 150; 
+  let crewFactor = 1.0;
+  if (numMen === 3 || numMen === 4) crewFactor = 1.2;
 
-  // -------------------
-  // Travel time input
-  // -------------------
+  const loadTimePerTrip = baseTimePerFullTrailer * (2 / numMen) * crewFactor * (trailerUsagePercent / 100);
+  const totalLoadTime = loadTimePerTrip * trips;
+
   if (includeTravel) {
     const userTravel = parseInt(document.getElementById("travel-minutes")?.value);
     if (!isNaN(userTravel)) travelMinutes = userTravel;
   }
 
-  // -------------------
-  // Quote calculation (based on average trailer)
-  // -------------------
   const avgTrailerSize = 710;
   const quoteTrips = Math.ceil(totalCuFt / avgTrailerSize);
   const rate = { 2: 120, 3: 160, 4: 200 }[numMen] || 200;
 
-  const totalEstimatedMinutes = totalTime + travelMinutes * quoteTrips;
+  const totalEstimatedMinutes = totalLoadTime + travelMinutes * quoteTrips;
   quote = totalEstimatedMinutes * rate / 60;
 
-  // -------------------
   // Update display
-  // -------------------
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
@@ -513,9 +500,6 @@ function calculateQuote(includeTravel=false){
   `;
 }
 
-
-
-// ------------------------ Event Listeners ------------------------
 document.getElementById("calculate-route").addEventListener("click", () => calculateQuote(true));
 
 // ------------------------ Initial Display ------------------------
