@@ -389,6 +389,8 @@ document.getElementById("add-item").addEventListener("click", () => {
 
     updateItemsList();
     calculateQuote();
+
+    quantityInput.value = 1;
   }
 });
 
@@ -474,7 +476,7 @@ function calculateQuote(includeTravel=false) {
   const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100; 
 
   const avgTrailerSize = 710;
-  const baseTimePerFullTrailer = 150;  
+  const baseTimePerFullTrailer = 150; 
 
   let crewFactor = 1.0;
   if (numMen === 3) crewFactor = 0.8;
@@ -489,10 +491,12 @@ function calculateQuote(includeTravel=false) {
   }
 
   const quoteTrips = Math.ceil(totalCuFt / trailerCapacity);
-  const rate = { 2: 120, 3: 160, 4: 200 }[numMen] || 200;
 
-  const totalEstimatedMinutes = totalLoadTime + travelMinutes * quoteTrips;
-  quote = totalEstimatedMinutes * rate / 60;
+  const totalMinutesIncludingTravel = totalLoadTime + travelMinutes * quoteTrips;
+  const totalManHours = (totalMinutesIncludingTravel / 60) * numMen;
+
+  const laborRatePerManHour = 60; 
+  quote = totalManHours * laborRatePerManHour;
 
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
@@ -500,12 +504,10 @@ function calculateQuote(includeTravel=false) {
     <div class="totals-row"><span>Men Selected</span><span>${numMen}</span></div>
     <div class="totals-row"><span>${selectedTrailer} Trailer Trips</span><span>${trips}</span></div>
     <div class="totals-row"><span>Trailer Usage</span><span>${trailerUsagePercent.toFixed(1)}%</span></div>
-    <div class="totals-row"><span>Time</span><span>${formatTime(Math.round(totalEstimatedMinutes))}</span></div>
+    <div class="totals-row"><span>Time</span><span>${formatTime(Math.round(totalMinutesIncludingTravel))}</span></div>
     <div class="totals-quote">$${quote.toFixed(2)}</div>
   `;
 }
-
-
 
 
 document.getElementById("calculate-route").addEventListener("click", () => calculateQuote(true));
