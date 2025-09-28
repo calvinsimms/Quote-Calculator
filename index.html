@@ -460,7 +460,8 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
 
 // ------------------------ Calculate Quote ------------------------
 function calculateQuote(includeTravel=false) {
-  let totalCuFt = 0, quote = 0, travelMinutes = 30;
+  let totalCuFt = 0, quote = 0;
+  let travelMinutes = 0; 
 
   selectedItems.forEach(i => {
     totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity;
@@ -473,7 +474,7 @@ function calculateQuote(includeTravel=false) {
   const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100; 
 
   const avgTrailerSize = 710;
-  const baseTimePerFullTrailer = 150;
+  const baseTimePerFullTrailer = 150;  
 
   let crewFactor = 1.0;
   if (numMen === 3) crewFactor = 0.8;
@@ -503,6 +504,8 @@ function calculateQuote(includeTravel=false) {
     <div class="totals-quote">$${quote.toFixed(2)}</div>
   `;
 }
+
+
 
 
 document.getElementById("calculate-route").addEventListener("click", () => calculateQuote(true));
