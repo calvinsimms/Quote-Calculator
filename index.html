@@ -469,26 +469,24 @@ function calculateQuote(includeTravel=false){
   const trips = Math.ceil(totalCuFt / trailerCapacity);
   const trailerUsagePercent = Math.min((totalCuFt / trailerCapacity) * 100, 100);
 
-  const baseTimePerFullTrailer = 150; 
+  const avgTrailerSize = 710;
+  const baseTimePerFullTrailer = 150;  
   let crewFactor = 1.0;
   if (numMen === 3 || numMen === 4) crewFactor = 1.2;
 
-  const loadTimePerTrip = baseTimePerFullTrailer * (2 / numMen) * crewFactor * (trailerUsagePercent / 100);
-  const totalLoadTime = loadTimePerTrip * trips;
+  const trailerEquivalents = totalCuFt / avgTrailerSize;
+  const totalLoadTime = baseTimePerFullTrailer * trailerEquivalents * (2 / numMen) * crewFactor;
 
   if (includeTravel) {
     const userTravel = parseInt(document.getElementById("travel-minutes")?.value);
     if (!isNaN(userTravel)) travelMinutes = userTravel;
   }
 
-  const avgTrailerSize = 710;
-  const quoteTrips = Math.ceil(totalCuFt / avgTrailerSize);
+  const quoteTrips = Math.ceil(trailerEquivalents);
   const rate = { 2: 120, 3: 160, 4: 200 }[numMen] || 200;
-
   const totalEstimatedMinutes = totalLoadTime + travelMinutes * quoteTrips;
   quote = totalEstimatedMinutes * rate / 60;
 
-  // Update display
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
@@ -499,6 +497,7 @@ function calculateQuote(includeTravel=false){
     <div class="totals-quote">$${quote.toFixed(2)}</div>
   `;
 }
+
 
 document.getElementById("calculate-route").addEventListener("click", () => calculateQuote(true));
 
