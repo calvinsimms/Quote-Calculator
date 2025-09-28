@@ -460,38 +460,59 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
 
 // ------------------------ Calculate Quote ------------------------
 function calculateQuote(includeTravel=false){
-  let totalCuFt = 0, quote = 0, travelMinutes = 30; // Default 30 min per trip
+  let totalCuFt = 0, quote = 0, travelMinutes = 30; // default travel per trip
 
-  selectedItems.forEach(i => { 
-    totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity; 
+  // Sum total cubic feet
+  selectedItems.forEach(i => {
+    totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity;
   });
 
-  // Trailer capacities based on selected trailer
+  // -------------------
+  // Trailer info for display
+  // -------------------
   const trailerSizes = { S: 670, L: 750 };
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
   const trips = Math.ceil(totalCuFt / trailerCapacity);
+  const trailerUsagePercent = Math.min((totalCuFt / trailerCapacity) * 100, 100);
 
-  const totalTime = selectedItems.length > 0 ? getLoadTime(trips, numMen) : 0;
-  const rate = { 2: 120, 3: 160, 4: 200 }[numMen] || 200;
+  // -------------------
+  // Continuous load time
+  // -------------------
+  const timePerCuFt = 1.0; // minutes per cubic foot for 1 person
+  const totalTime = totalCuFt > 0 ? (totalCuFt * timePerCuFt) / numMen : 0;
 
-  // Only override travelMinutes if user input exists
+  // -------------------
+  // Travel time input
+  // -------------------
   if (includeTravel) {
     const userTravel = parseInt(document.getElementById("travel-minutes")?.value);
     if (!isNaN(userTravel)) travelMinutes = userTravel;
   }
 
-  const totalEstimatedMinutes = totalTime + travelMinutes * trips;
+  // -------------------
+  // Quote calculation (based on average trailer)
+  // -------------------
+  const avgTrailerSize = 710;
+  const quoteTrips = Math.ceil(totalCuFt / avgTrailerSize);
+  const rate = { 2: 120, 3: 160, 4: 200 }[numMen] || 200;
+
+  const totalEstimatedMinutes = totalTime + travelMinutes * quoteTrips;
   quote = totalEstimatedMinutes * rate / 60;
 
+  // -------------------
+  // Update display
+  // -------------------
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
     <div class="totals-row"><span>Men Selected</span><span>${numMen}</span></div>
     <div class="totals-row"><span>${selectedTrailer} Trailer Trips</span><span>${trips}</span></div>
+    <div class="totals-row"><span>Trailer Usage</span><span>${trailerUsagePercent.toFixed(1)}%</span></div>
     <div class="totals-row"><span>Time</span><span>${formatTime(Math.round(totalEstimatedMinutes))}</span></div>
     <div class="totals-quote">$${quote.toFixed(2)}</div>
   `;
 }
+
 
 
 // ------------------------ Event Listeners ------------------------
