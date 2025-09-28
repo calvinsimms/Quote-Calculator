@@ -459,7 +459,7 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
 });
 
 // ------------------------ Calculate Quote ------------------------
-function calculateQuote(includeTravel=false){
+function calculateQuote(includeTravel=false) {
   let totalCuFt = 0, quote = 0, travelMinutes = 30;
 
   selectedItems.forEach(i => {
@@ -468,11 +468,13 @@ function calculateQuote(includeTravel=false){
 
   const trailerSizes = { S: 670, L: 750 };
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
+
   const trips = Math.ceil(totalCuFt / trailerCapacity);
-  const trailerUsagePercent = Math.min((totalCuFt / trailerCapacity) * 100, 100);
+  const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100; 
 
   const avgTrailerSize = 710;
-  const baseTimePerFullTrailer = 150;  
+  const baseTimePerFullTrailer = 150;
+
   let crewFactor = 1.0;
   if (numMen === 3) crewFactor = 0.8;
   if (numMen === 4) crewFactor = 0.6;
@@ -485,8 +487,9 @@ function calculateQuote(includeTravel=false){
     if (!isNaN(userTravel)) travelMinutes = userTravel;
   }
 
-  const quoteTrips = Math.ceil(trailerEquivalents);
+  const quoteTrips = Math.ceil(totalCuFt / trailerCapacity);
   const rate = { 2: 120, 3: 160, 4: 200 }[numMen] || 200;
+
   const totalEstimatedMinutes = totalLoadTime + travelMinutes * quoteTrips;
   quote = totalEstimatedMinutes * rate / 60;
 
@@ -501,6 +504,7 @@ function calculateQuote(includeTravel=false){
   `;
 }
 
+
 document.getElementById("calculate-route").addEventListener("click", () => calculateQuote(true));
 
 // ------------------------ Initial Display ------------------------
@@ -508,6 +512,7 @@ loadItemsData();
 updateItemsList();
 calculateQuote();
 </script>
+
 
 </body>
 </html>
