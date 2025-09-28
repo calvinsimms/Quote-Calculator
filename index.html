@@ -301,23 +301,23 @@ async function loadItemsData() {
     let itemName = row.c[0]?.v?.trim();
     const cubicFeet = row.c[1]?.v;
     if(itemName && cubicFeet){
-      itemsData[itemName.toLowerCase()] = { name: itemName, cubicFeet }; // store original name too
+      itemsData[itemName.toLowerCase()] = { name: itemName, cubicFeet }; // store original name
     }
   });
 
   itemsList = Object.values(itemsData).map(i => i.name); // original names for dropdown
+
+  // After data is loaded, attach event listeners to ensure dropdown works
+  attachDropdownEvents();
+
   updateItemsList();
   calculateQuote(); // initial totals
 }
 
-// Initial load
-loadItemsData();
-
-// ------------------------ Autocomplete & Dropdown ------------------------
+// ------------------------ Dropdown logic ------------------------
 const searchInput = document.getElementById("item-select");
 const dropdown = document.getElementById("dropdown");
 
-// Update dropdown based on input
 function updateDropdown() {
   const val = searchInput.value.toLowerCase().trim();
   dropdown.innerHTML = "";
@@ -342,14 +342,17 @@ function updateDropdown() {
   dropdown.style.display = dropdown.children.length ? "block" : "none";
 }
 
-// Show dropdown on focus or input
-searchInput.addEventListener("focus", updateDropdown);
-searchInput.addEventListener("input", updateDropdown);
+// Attach events after itemsList is loaded
+function attachDropdownEvents() {
+  searchInput.addEventListener("focus", updateDropdown);
+  searchInput.addEventListener("input", updateDropdown);
 
-// Hide dropdown when clicking outside
-document.addEventListener("click", e => { 
-  if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display="none";
-});
+  document.addEventListener("click", e => { 
+    if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.style.display = "none";
+    }
+  });
+}
 
 // ------------------------ Add Item ------------------------
 document.getElementById("add-item").addEventListener("click", () => {
@@ -361,7 +364,7 @@ document.getElementById("add-item").addEventListener("click", () => {
     if(existing){ 
       existing.quantity += quantity; 
     } else { 
-      selectedItems.push({ name: itemsData[inputName].name, quantity }); // original casing
+      selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
     document.getElementById("item-quantity").value = 1;
     updateItemsList();
@@ -461,7 +464,6 @@ document.getElementById("calculate-route").addEventListener("click",()=>calculat
 updateItemsList();
 calculateQuote();
 </script>
-
 
 </body>
 </html>
