@@ -33,7 +33,7 @@ body {
   padding: 10px;        
   width: 320px;         
   border: solid;
-  border-radius: 25px;
+  border-radius: 27px;
   border-color: #ffffff;
   background-color: #fff;
   box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
@@ -68,9 +68,7 @@ input::placeholder {
     height: 30px;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    padding: 0;                 
-    line-height: 1;             
+    justify-content: center;              
     -webkit-appearance: none;
     appearance: none;
     font-family: inherit;
@@ -81,9 +79,7 @@ input::placeholder {
     align-items: center;          
     justify-content: center;     
     font-size: 25px;
-    height: 30px;
-    padding: 0;    
-    line-height: 1;
+    padding: 5px;    
     -webkit-appearance: none;
     appearance: none;
     -webkit-font-smoothing: antialiased;
@@ -103,8 +99,8 @@ input::placeholder {
   display: flex;
   align-items: center; 
   justify-content: center;   
-  width: 100px;  
-  border-radius: 50px;       
+  width: 100%;  
+  border-radius: 20px;       
   font-weight: bold;
   font-size: 16px;
   background: linear-gradient(145deg, #6cc1ff, #3a8dff);
@@ -197,7 +193,7 @@ input::placeholder {
     margin-bottom: 10px;
     width: 320px;
     border: solid;
-    border-radius: 25px;
+    border-radius: 27px;
     border-color: #ffffff;
     background-color: #fff;
     box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
@@ -225,7 +221,7 @@ input::placeholder {
 .trailer-container {
   display: flex;
   align-items: center;
-  width: 90%;
+  width: 97%;
 }
 
 .crew-container span,
@@ -242,7 +238,7 @@ input::placeholder {
 
 .crew-btn,
 .trailer-btn {
-  padding: 6px 12px;
+  padding: 5px;
   border-radius: 20px;
   width: 40px;
   border: none;
@@ -297,8 +293,9 @@ input::placeholder {
   <div class="trailer-container">
     <span>Trailer Size</span>
     <div class="button-group">
-      <button class="trailer-btn active" data-trailer="S">S</button>
-      <button class="trailer-btn" data-trailer="L">L</button>
+      <button class="trailer-btn active" data-trailer="Small Trailer">S</button>
+      <button class="trailer-btn" data-trailer="Large Trailer">L</button>
+      <button class="trailer-btn" data-trailer="Both Trailers">B</button>
     </div>
   </div>
 </div>
@@ -448,7 +445,7 @@ document.querySelectorAll(".crew-btn").forEach(btn => {
   });
 });
 
-let selectedTrailer = "S"; 
+let selectedTrailer = "Small Trailer"; 
 
 // ------------------------ Trailer Button Logic ------------------------
 document.querySelectorAll(".trailer-btn").forEach(btn => {
@@ -501,9 +498,9 @@ function calculateQuote(includeTravel=false) {
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
-    <div class="totals-row"><span>Men Selected</span><span>${numMen}</span></div>
-    <div class="totals-row"><span>${selectedTrailer} Trailer Trips</span><span>${trips}</span></div>
-    <div class="totals-row"><span>Trailer Usage</span><span>${trailerUsagePercent.toFixed(1)}%</span></div>
+    <div class="totals-row"><span>Crew Size</span><span>${numMen}</span></div>
+    <div class="totals-row"><span>${selectedTrailer} Trips</span><span>${trips}</span></div>
+    <div class="totals-row"><span>${selectedTrailer} Usage</span><span>${trailerUsagePercent.toFixed(1)}%</span></div>
     <div class="totals-row"><span>Time</span><span>${formatTime(Math.round(totalMinutesIncludingTravel))}</span></div>
     <div class="totals-quote">$${quote.toFixed(2)}</div>
   `;
