@@ -5,14 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Quote Calculator</title>
 <style>
-
 h1 { 
   font-family: "Brush Script MT", cursive; 
   font-size: 40px; 
   margin-bottom: 0px;
   margin-top: 0px; 
 }
-
 body { 
   font-family: Arial, sans-serif; 
   display: flex; 
@@ -24,7 +22,6 @@ body {
   font-size: 18px;
   background-color: #f5f5f5;
 }
-
 .input-container {
   box-sizing: border-box;
   margin-bottom: 10px;
@@ -41,7 +38,6 @@ body {
   background-color: #fff;
   box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
 }
-
 input, select, button { 
     text-align: center; 
     width: 100%; 
@@ -53,23 +49,19 @@ input, select, button {
     box-sizing: border-box;    
     font-family: inherit;      
 }
-
 input:focus, select:focus { 
     border-color: #007BFF; 
     box-shadow: 0 1px 5px rgba(58, 141, 255, 0.3);
     outline: none; 
 }
-
 input::placeholder {
     color: #a4a4a4;      
     font-style: italic;   
     opacity: 1;          
 }
-
 .small-input {
     width: 45px;
 }
-
 .small-button {
     width: 40px;
     font-size: 20px;
@@ -84,7 +76,6 @@ input::placeholder {
     font-family: inherit;
     box-sizing: border-box;
 }
-
 .button-bubble {
     display: inline-flex;        
     align-items: center;          
@@ -105,11 +96,9 @@ input::placeholder {
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
 }
-
 .button-bubble:active {
     background: linear-gradient(145deg, #3a8dff, #6cc1ff); 
 }
-
 .calculate-button {
   display: flex;
   align-items: center; 
@@ -125,7 +114,6 @@ input::placeholder {
   box-shadow: 0 1px 5px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
 }
-
 #items-list {
   box-sizing: border-box;
   width: 290px;
@@ -133,12 +121,9 @@ input::placeholder {
   flex-direction: column; 
   gap: 5px;               
 }
-
 #items-list:empty {
   display: none;
 }
-
-
 .selected-item {
   display: flex;
   align-items: center;
@@ -147,23 +132,18 @@ input::placeholder {
   width: 100%;
   box-sizing: border-box;
 }
-
 .selected-item .remove-btn {
   width: 25px;              
   text-align: left;
 }
-
 .selected-item .item-name {
   flex: 1;               
   text-align: center;    
 }
-
 .selected-item .item-quantity {
   width: 37px;              
   text-align: right;
 }
-
-/* Small bubble button (for "X" remove buttons) */
 .button-bubble-small {
   display: inline-flex;
   align-items: center;
@@ -181,11 +161,9 @@ input::placeholder {
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
-
 .button-bubble-small:active {
   background: linear-gradient(145deg, #ff3a3a, #ff6c6c);
 }
-
 .dropdown {
   position: absolute;
   top: 49px;
@@ -198,11 +176,9 @@ input::placeholder {
   display: none;
   z-index: 100;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-
   backdrop-filter: blur(10px); 
   -webkit-backdrop-filter: blur(10px);
 }
-
 .dropdown-item {
   display: flex;
   align-items: center;
@@ -211,11 +187,34 @@ input::placeholder {
   cursor: pointer;
   border-bottom: 1px solid rgba(91, 91, 91, 0.05);
 }
-
 .dropdown-item:last-child {
   border-bottom: none;
 }
+.crew-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.crew-container span {
+  white-space: nowrap; 
+  flex-shrink: 0;      
 
+}
+.crew-btn {
+  padding: 6px 12px;
+  border-radius: 20px;
+  width: 40px;
+  border: none;
+  background: linear-gradient(145deg, #c8c8c8, #9b9b9b);
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+.crew-btn.active {
+    background: linear-gradient(145deg, #6cc1ff, #3a8dff);
+}
 .totals {
   box-sizing: border-box;
   font-size: 16px;
@@ -227,7 +226,6 @@ input::placeholder {
   background-color: #fff;
   box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
 }
-
 .totals-row {
   display: flex;
   justify-content: space-between; 
@@ -237,19 +235,16 @@ input::placeholder {
   margin-bottom: 5px;
   font-size: 16px;
 }
-
 .totals-quote {
   text-align: center;
   font-size: 28px;
   font-weight: bold;
   margin-top: 10px;
 }
-
 #load-address,
 #unload-address {
   width: 100%;
 }
-
 </style>
 </head>
 <body>
@@ -259,9 +254,7 @@ input::placeholder {
 <!-- Item input fields -->
 <div id="item-inputs" class="input-container">
     <div style="display: flex; width: 100%; align-items: center; gap: 5px;">
-        <!-- Item select -->
         <input type="text" id="item-select" placeholder="select item..." autocomplete="off" style="flex: 1;">
-        <!-- Quantity + Add button -->
         <div style="display: flex; gap: 5px; align-items: center;">
             <input type="number" id="item-quantity" value="1" min="1" class="small-input">
             <button id="add-item" class="small-button button-bubble">+</button>
@@ -271,99 +264,105 @@ input::placeholder {
     <div id="items-list"></div>
 </div>
 
-<!-- Load and Unload addresses -->
 <div id="unload-input" class="input-container">
   <input type="text" id="load-address" placeholder="load address..." autocomplete="off">
   <input type="text" id="unload-address" placeholder="unload address..." autocomplete="off">
   <button id="calculate-route" class="calculate-button button-bubble">Calculate</button>
 </div>
 
+<div class="input-container" id="crew-buttons-container">
+  <div class="crew-container">
+    <span>Crew Size</span>
+    <button class="crew-btn active" data-men="2">2</button>
+    <button class="crew-btn" data-men="3">3</button>
+    <button class="crew-btn" data-men="4">4</button>
+  </div>
+</div>
+
 <div id="totals" class="totals"></div>
 
-<!-- =========================== JAVASCRIPT =========================== -->
-<!-- =========================== JAVASCRIPT =========================== -->
-<!-- =========================== JAVASCRIPT =========================== -->
-<!-- =========================== JAVASCRIPT =========================== -->
- 
 <script>
-// Define items
-let itemsData = {
-  "Sofa": { cubicFeet: 60, time: 30, menNeeded: 2 },
-  "Dining Table": { cubicFeet: 40, time: 20, menNeeded: 2 },
-  "Bed (Queen)": { cubicFeet: 50, time: 25, menNeeded: 2 },
-  "Dresser": { cubicFeet: 30, time: 15, menNeeded: 1 },
-  "Box (Large)": { cubicFeet: 10, time: 5, menNeeded: 1 },
-  "Box (Small)": { cubicFeet: 5, time: 3, menNeeded: 1 }
-};
-
-let itemsList = Object.keys(itemsData);
+let itemsData = {}; 
+let itemsList = [];
 let selectedItems = [];
+let numMen = 2; // Default crew size
 
-// Autocomplete
+// Load Google Sheets data
+async function loadItemsData() {
+  const url = "https://docs.google.com/spreadsheets/d/1cW3RxxxLof_CcXueLCtNfYNqXnrCeAzfHnALnE82ihk/gviz/tq?tqx=out:json&sheet=Sheet1";
+  const response = await fetch(url);
+  const text = await response.text();
+  const json = JSON.parse(text.substring(47).slice(0, -2));
+
+  json.table.rows.forEach(row => {
+    const itemName = row.c[0]?.v;
+    const cubicFeet = row.c[1]?.v;
+    if(itemName && cubicFeet){
+      itemsData[itemName] = { cubicFeet };
+    }
+  });
+
+  itemsList = Object.keys(itemsData);
+  updateDropdown();
+  updateItemsList();
+  calculateQuote(); // initial totals
+}
+
+// Initial load
+loadItemsData();
+
+// --- Autocomplete & Add Item ---
 const searchInput = document.getElementById("item-select");
 const dropdown = document.getElementById("dropdown");
 
 function updateDropdown() {
   const val = searchInput.value.toLowerCase();
   dropdown.innerHTML = "";
-  itemsList
-    .filter(item => item.toLowerCase().includes(val))
+  itemsList.filter(item => item.toLowerCase().includes(val))
     .forEach(item => {
       const div = document.createElement("div");
       div.classList.add("dropdown-item");
       div.textContent = item;
-      div.addEventListener("click", () => {
-        searchInput.value = item;
-        dropdown.style.display = "none";
+      div.addEventListener("click", () => { 
+        searchInput.value = item; 
+        dropdown.style.display = "none"; 
       });
       dropdown.appendChild(div);
     });
   dropdown.style.display = dropdown.children.length ? "block" : "none";
 }
 
-searchInput.addEventListener("focus", () => {
-  searchInput.value = "";
-  updateDropdown();
-});
+searchInput.addEventListener("focus", () => { searchInput.value=""; updateDropdown(); });
 searchInput.addEventListener("input", updateDropdown);
-document.addEventListener("click", (e) => { 
-  if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
-    dropdown.style.display = "none"; 
-  }
+document.addEventListener("click", e => { 
+  if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display="none";
 });
 
-// Add item
 document.getElementById("add-item").addEventListener("click", () => {
-  let itemName = searchInput.value.trim(); 
-  let quantity = parseInt(document.getElementById("item-quantity").value) || 0;
-
-  if (quantity > 0 && itemsData[itemName]) {
+  const itemName = searchInput.value.trim();
+  const quantity = parseInt(document.getElementById("item-quantity").value) || 0;
+  if(quantity>0 && itemsData[itemName]){
     let existing = selectedItems.find(i => i.name === itemName);
-    if (existing) {
-      existing.quantity += quantity;
-    } else {
-      selectedItems.push({ name: itemName, quantity: quantity });
-    }
+    if(existing){ existing.quantity += quantity; }
+    else{ selectedItems.push({ name: itemName, quantity }); }
     document.getElementById("item-quantity").value = 1;
-    updateItemsList(); 
+    updateItemsList();
     calculateQuote();
   }
 });
 
-// Update selected items list
-function updateItemsList() {
+function updateItemsList(){
   const listDiv = document.getElementById("items-list");
-  listDiv.innerHTML = ""; 
-
-  selectedItems.forEach((item, index) => {
+  listDiv.innerHTML="";
+  selectedItems.forEach((item,index)=>{
     const itemDiv = document.createElement("div");
     itemDiv.classList.add("selected-item");
 
     const removeBtn = document.createElement("button");
-    removeBtn.textContent = "X";
-    removeBtn.classList.add("button-bubble-small", "remove-btn");
-    removeBtn.addEventListener("click", () => { 
-      selectedItems.splice(index, 1); 
+    removeBtn.textContent="X";
+    removeBtn.classList.add("button-bubble-small","remove-btn");
+    removeBtn.addEventListener("click",()=>{ 
+      selectedItems.splice(index,1); 
       updateItemsList(); 
       calculateQuote(); 
     });
@@ -373,96 +372,76 @@ function updateItemsList() {
     nameSpan.classList.add("item-name");
 
     const qtySpan = document.createElement("span");
-    qtySpan.textContent = `${item.quantity}`;
+    qtySpan.textContent=item.quantity;
     qtySpan.classList.add("item-quantity");
 
-    itemDiv.appendChild(removeBtn);
-    itemDiv.appendChild(nameSpan);
-    itemDiv.appendChild(qtySpan);
-
+    itemDiv.append(removeBtn,nameSpan,qtySpan);
     listDiv.appendChild(itemDiv);
   });
 }
 
-// Format time
-function formatTime(totalMinutes) {
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+// --- Helpers ---
+function formatTime(minutes){ 
+  const h=Math.floor(minutes/60); 
+  const m=minutes%60; 
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`; 
 }
 
-// Calculate quote
-document.getElementById("calculate-route").addEventListener("click", () => { 
-  calculateQuote(true); 
+function getLoadTime(trips,men){ 
+  if(men===2) return trips*2.5*60; 
+  if(men===3) return trips*2*60; 
+  if(men===4) return trips*1.5*60; 
+  return 0; 
+}
+
+// --- Crew Buttons ---
+document.querySelectorAll(".crew-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".crew-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    numMen = parseInt(btn.dataset.men);
+    calculateQuote();
+  });
 });
 
-function calculateQuote(includeTravel = false) {
-  let totalCuFt = 0, totalTime = 0, totalMen = 0, quote = 0, travelMinutes = 0;
-
-  const trailers = [
-    { name: "Small Trailer", size: 670 },
-    { name: "Large Trailer", size: 750 }
-  ];
+// --- Calculate Quote ---
+function calculateQuote(includeTravel=false){
+  let totalCuFt=0, quote=0, travelMinutes=0;
+  const trailers=[{name:"Small Trailer",size:670},{name:"Large Trailer",size:750}];
 
   selectedItems.forEach(i => { 
-    totalCuFt += itemsData[i.name].cubicFeet * i.quantity; 
-    totalTime += itemsData[i.name].time * i.quantity; 
+    totalCuFt += itemsData[i.name].cubicFeet*i.quantity; 
   });
 
-  const trailerInfo = trailers.map(t => ({ 
-    ...t, 
-    trips: Math.ceil(totalCuFt / t.size) 
-  }));
+  const trailerInfo = trailers.map(t=>({...t,trips:Math.ceil(totalCuFt/t.size)}));
+  const minTrips = Math.min(...trailerInfo.map(t=>t.trips));
 
-  const minTrips = Math.min(...trailerInfo.map(t => t.trips));
-  const avgTrailerSize = (670 + 750) / 2; 
-  const loads = totalCuFt / avgTrailerSize;
-  totalMen = loads <= 1.4 ? 2 : loads <= 1.9 ? 3 : 4;
+  const totalTime = selectedItems.length>0 ? getLoadTime(minTrips,numMen) : 0;
+  const rate = {2:120,3:160,4:200}[numMen]||200;
 
-  const rate = {2:120, 3:160, 4:200}[totalMen] || 200;
-
-  if (includeTravel) {
-    travelMinutes = parseInt(document.getElementById("travel-minutes")?.value) || 0;
-  }
-
-  const totalEstimatedMinutes = totalTime + travelMinutes * minTrips;
-  quote = totalEstimatedMinutes * rate / 60;
+  if(includeTravel) travelMinutes = parseInt(document.getElementById("travel-minutes")?.value)||0;
+  const totalEstimatedMinutes = totalTime + travelMinutes*minTrips;
+  quote = totalEstimatedMinutes*rate/60;
 
   const totalsDiv = document.getElementById("totals");
-  totalsDiv.innerHTML = "";
-
-  const totalCuFtRow = document.createElement("div");
-  totalCuFtRow.classList.add("totals-row");
-  totalCuFtRow.innerHTML = `<span>Cubic Feet</span><span>${totalCuFt}</span>`;
-  totalsDiv.appendChild(totalCuFtRow);
-
-  const totalMenRow = document.createElement("div");
-  totalMenRow.classList.add("totals-row");
-  totalMenRow.innerHTML = `<span>Men Needed</span><span>${totalMen}</span>`;
-  totalsDiv.appendChild(totalMenRow);
-
-  trailerInfo.forEach(t => {
-    const trailerRow = document.createElement("div");
-    trailerRow.classList.add("totals-row");
-    trailerRow.innerHTML = `<span>${t.name} Trips</span><span>${t.trips}</span>`;
-    totalsDiv.appendChild(trailerRow);
-  });
-
-  const totalTimeRow = document.createElement("div");
-  totalTimeRow.classList.add("totals-row");
-  totalTimeRow.innerHTML = `<span>Time</span><span>${formatTime(Math.round(totalEstimatedMinutes))}</span>`;
-  totalsDiv.appendChild(totalTimeRow);
-
-  const quoteDiv = document.createElement("div");
-  quoteDiv.classList.add("totals-quote");
-  quoteDiv.textContent = `$${quote.toFixed(2)}`;
-  totalsDiv.appendChild(quoteDiv);
+  totalsDiv.innerHTML="";
+  totalsDiv.innerHTML = `
+    <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
+    <div class="totals-row"><span>Men Selected</span><span>${numMen}</span></div>
+    <div class="totals-row"><span>Small Trailer Trips</span><span>${trailerInfo[0].trips}</span></div>
+    <div class="totals-row"><span>Large Trailer Trips</span><span>${trailerInfo[1].trips}</span></div>
+    <div class="totals-row"><span>Time</span><span>${formatTime(Math.round(totalEstimatedMinutes))}</span></div>
+    <div class="totals-quote">$${quote.toFixed(2)}</div>
+  `;
 }
 
-// Initial display
+// --- Event Listeners ---
+document.getElementById("calculate-route").addEventListener("click",()=>calculateQuote(true));
+
+// --- Initial Display ---
 updateItemsList();
 calculateQuote();
-</script>
 
+</script>
 </body>
 </html>
