@@ -190,18 +190,58 @@ input::placeholder {
 .dropdown-item:last-child {
   border-bottom: none;
 }
-.crew-container {
+.totals {
+    box-sizing: border-box;
+    font-size: 16px;
+    padding: 10px;
+    margin-bottom: 10px;
+    width: 320px;
+    border: solid;
+    border-radius: 25px;
+    border-color: #ffffff;
+    background-color: #fff;
+    box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
+}
+.totals-row {
+    display: flex;
+    justify-content: space-between; 
+    margin-left: 3px;
+    margin-right: 3px;
+    margin-top: 2px;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+.totals-quote {
+    text-align: center;
+    font-size: 28px;
+    font-weight: bold;
+    margin-top: 10px;
+}
+#load-address,
+#unload-address {
+    width: 100%;
+}
+.crew-container,
+.trailer-container {
   display: flex;
   align-items: center;
-  gap: 10px;
+  width: 90%;
 }
-.crew-container span {
-  white-space: nowrap; 
-  flex-shrink: 0; 
-  margin-right: 10px;     
 
+.crew-container span,
+.trailer-container span {
+  flex-shrink: 0;
+  font-size: 18px;
 }
-.crew-btn {
+
+.button-group {
+  display: flex;
+  gap: 10px;       
+  margin-left: auto; 
+}
+
+.crew-btn,
+.trailer-btn {
   padding: 6px 12px;
   border-radius: 20px;
   width: 40px;
@@ -210,47 +250,18 @@ input::placeholder {
   color: white;
   cursor: pointer;
   font-weight: bold;
-  transition: all 0.3s ease;
 }
-.crew-btn.active {
-    background: linear-gradient(145deg, #6cc1ff, #3a8dff);
-    box-shadow: 0 1px 5px rgba(0,0,0,0.2);
 
+.crew-btn.active,
+.trailer-btn.active {
+  background: linear-gradient(145deg, #6cc1ff, #3a8dff);
+  box-shadow: 0 1px 5px rgba(0,0,0,0.2);
 }
-.totals {
-  box-sizing: border-box;
-  font-size: 16px;
-  padding: 10px;
-  width: 320px;
-  border: solid;
-  border-radius: 25px;
-  border-color: #ffffff;
-  background-color: #fff;
-  box-shadow: 0 1px 5px rgba(169, 169, 169, 0.2);
-}
-.totals-row {
-  display: flex;
-  justify-content: space-between; 
-  margin-left: 3px;
-  margin-right: 3px;
-  margin-top: 2px;
-  margin-bottom: 5px;
-  font-size: 16px;
-}
-.totals-quote {
-  text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-  margin-top: 10px;
-}
-#load-address,
-#unload-address {
-  width: 100%;
-}
+
 </style>
 </head>
 <body>
-
+    
 <h1>Quote Calculator</h1>
 
 <!-- Item input fields -->
@@ -272,16 +283,27 @@ input::placeholder {
   <button id="calculate-route" class="calculate-button button-bubble">Calculate</button>
 </div>
 
+
+<div id="totals" class="totals"></div>
+
 <div class="input-container" id="crew-buttons-container">
   <div class="crew-container">
     <span>Crew Size</span>
-    <button class="crew-btn active" data-men="2">2</button>
-    <button class="crew-btn" data-men="3">3</button>
-    <button class="crew-btn" data-men="4">4</button>
+    <div class="button-group">
+      <button class="crew-btn active" data-men="2">2</button>
+      <button class="crew-btn" data-men="3">3</button>
+      <button class="crew-btn" data-men="4">4</button>
+    </div>
+  </div>
+  <div class="trailer-container">
+    <span>Trailer Size</span>
+    <div class="button-group">
+      <button class="trailer-btn active" data-trailer="S">S</button>
+      <button class="trailer-btn" data-trailer="L">L</button>
+    </div>
   </div>
 </div>
 
-<div id="totals" class="totals"></div>
 
 <script>
 let itemsData = {}; 
@@ -424,45 +446,63 @@ document.querySelectorAll(".crew-btn").forEach(btn => {
   });
 });
 
+let selectedTrailer = "S"; // Default trailer size (S or L)
+
+// ------------------------ Trailer Button Logic ------------------------
+document.querySelectorAll(".trailer-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".trailer-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedTrailer = btn.dataset.trailer;
+    calculateQuote(); // recalc when trailer changes
+  });
+});
+
 // ------------------------ Calculate Quote ------------------------
 function calculateQuote(includeTravel=false){
-  let totalCuFt=0, quote=0, travelMinutes=0;
-  const trailers=[{name:"Small Trailer",size:670},{name:"Large Trailer",size:750}];
+  let totalCuFt = 0, quote = 0, travelMinutes = 30; // Default 30 min per trip
 
   selectedItems.forEach(i => { 
-    totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet*i.quantity; 
+    totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity; 
   });
 
-  const trailerInfo = trailers.map(t=>({...t,trips:Math.ceil(totalCuFt/t.size)}));
-  const minTrips = Math.min(...trailerInfo.map(t=>t.trips));
+  // Trailer capacities based on selected trailer
+  const trailerSizes = { S: 670, L: 750 };
+  const trailerCapacity = trailerSizes[selectedTrailer] || 670;
+  const trips = Math.ceil(totalCuFt / trailerCapacity);
 
-  const totalTime = selectedItems.length>0 ? getLoadTime(minTrips,numMen) : 0;
-  const rate = {2:120,3:160,4:200}[numMen]||200;
+  const totalTime = selectedItems.length > 0 ? getLoadTime(trips, numMen) : 0;
+  const rate = { 2: 120, 3: 160, 4: 200 }[numMen] || 200;
 
-  if(includeTravel) travelMinutes = parseInt(document.getElementById("travel-minutes")?.value)||0;
-  const totalEstimatedMinutes = totalTime + travelMinutes*minTrips;
-  quote = totalEstimatedMinutes*rate/60;
+  // Only override travelMinutes if user input exists
+  if (includeTravel) {
+    const userTravel = parseInt(document.getElementById("travel-minutes")?.value);
+    if (!isNaN(userTravel)) travelMinutes = userTravel;
+  }
+
+  const totalEstimatedMinutes = totalTime + travelMinutes * trips;
+  quote = totalEstimatedMinutes * rate / 60;
 
   const totalsDiv = document.getElementById("totals");
-  totalsDiv.innerHTML="";
   totalsDiv.innerHTML = `
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
     <div class="totals-row"><span>Men Selected</span><span>${numMen}</span></div>
-    <div class="totals-row"><span>Small Trailer Trips</span><span>${trailerInfo[0].trips}</span></div>
-    <div class="totals-row"><span>Large Trailer Trips</span><span>${trailerInfo[1].trips}</span></div>
+    <div class="totals-row"><span>${selectedTrailer} Trailer Trips</span><span>${trips}</span></div>
     <div class="totals-row"><span>Time</span><span>${formatTime(Math.round(totalEstimatedMinutes))}</span></div>
     <div class="totals-quote">$${quote.toFixed(2)}</div>
   `;
 }
 
+
 // ------------------------ Event Listeners ------------------------
-document.getElementById("calculate-route").addEventListener("click",()=>calculateQuote(true));
+document.getElementById("calculate-route").addEventListener("click", () => calculateQuote(true));
 
 // ------------------------ Initial Display ------------------------
 loadItemsData();
 updateItemsList();
 calculateQuote();
 </script>
+
 
 </body>
 </html>
