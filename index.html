@@ -168,15 +168,18 @@ input::placeholder {
 }
 .dropdown {
   position: absolute;
+  top: 49px;
+  width: 301px; 
   max-height: 250px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 25px;
+  font-size: 16px;
   overflow-y: auto;
   display: none;
-  border-radius: 8px;
-  font-size: 16px;
-  z-index: 1000;
-  background: #fff; /* ensure visibility */
-  color: #000;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  z-index: 100;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px);
 }
 .dropdown-item {
   display: flex;
@@ -256,6 +259,7 @@ input::placeholder {
   background: linear-gradient(145deg, #6cc1ff, #3a8dff);
   box-shadow: 0 1px 5px rgba(0,0,0,0.2);
 }
+
 </style>
 </head>
 <body>
@@ -459,9 +463,6 @@ function setupAutocomplete(inputEl, dropdownEl) {
       dropdownEl.appendChild(div);
     });
 
-    const rect = inputEl.getBoundingClientRect();
-    dropdownEl.style.width = inputEl.offsetWidth + "px";
-
     dropdownEl.style.display = suggestions.length ? "block" : "none";
   });
 
@@ -647,7 +648,6 @@ loadItemsData();
 updateItemsList();
 calculateQuote();
 </script>
-
 
 </body>
 </html>
