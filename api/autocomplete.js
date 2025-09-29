@@ -18,7 +18,6 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         input,
         languageCode: 'en',
-        types: ['address'],
         // You can add locationBias or sessionToken if needed
       }),
     });
