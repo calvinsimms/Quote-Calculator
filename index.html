@@ -301,7 +301,7 @@ const unloadInput = document.getElementById("unload-address");
 
 // ------------------------ Load Google Sheets data ------------------------
 async function loadItemsData() {
-  const url = "https://docs.google.com/spreadsheets/d/1cW3RxxxLof_CcXueLCtNfYNqXnrCeAzfHnALnE82ihk/gviz/tq?tqx=out:json&sheet=Sheet1";
+  const url = "https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/gviz/tq?tqx=out:json&sheet=Sheet1";
   const response = await fetch(url);
   const text = await response.text();
   const json = JSON.parse(text.substring(47).slice(0, -2));
@@ -319,21 +319,21 @@ async function loadItemsData() {
   calculateQuote();
 }
 
-// ------------------------ Dropdown logic ------------------------
+// ------------------------ Dropdown for item selection ------------------------
 function updateDropdown(filterValue) {
   const val = filterValue.toLowerCase().trim();
   dropdown.innerHTML = "";
 
-  let matches = itemsList.filter(item => item.toLowerCase().includes(val));
-  matches.sort((a,b)=> a.localeCompare(b));
+  const matches = itemsList.filter(item => item.toLowerCase().includes(val));
+  matches.sort((a,b) => a.localeCompare(b));
 
-  matches.forEach(item=>{
+  matches.forEach(item => {
     const div = document.createElement("div");
     div.classList.add("dropdown-item");
     div.textContent = item;
-    div.addEventListener("click", () => { 
-      searchInput.value = item; 
-      dropdown.style.display = "none"; 
+    div.addEventListener("click", () => {
+      searchInput.value = item;
+      dropdown.style.display = "none";
       calculateQuote();
     });
     dropdown.appendChild(div);
@@ -342,30 +342,28 @@ function updateDropdown(filterValue) {
   dropdown.style.display = matches.length ? "block" : "none";
 }
 
-searchInput.addEventListener("focus", ()=>{ 
+searchInput.addEventListener("focus", () => {
   searchInput.value = ""; 
-  if(itemsList.length>0) updateDropdown(""); 
+  if(itemsList.length > 0) updateDropdown(""); 
 });
-
-searchInput.addEventListener("input", ()=> updateDropdown(searchInput.value));
-
-document.addEventListener("click", e=>{
+searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
+document.addEventListener("click", e => {
   if(!searchInput.contains(e.target) && !dropdown.contains(e.target)){
     dropdown.style.display = "none";
   }
 });
 
-// ------------------------ Add Item ------------------------
+// ------------------------ Add / Remove Items ------------------------
 document.getElementById("add-item").addEventListener("click", () => {
   const inputName = searchInput.value.trim().toLowerCase();
   const quantity = parseInt(quantityInput.value) || 0;
 
   if(quantity > 0 && itemsData[inputName]){
-    let existing = selectedItems.find(i=> i.name.toLowerCase() === inputName);
+    const existing = selectedItems.find(i => i.name.toLowerCase() === inputName);
     if(existing){ 
-        existing.quantity += quantity; 
+      existing.quantity += quantity; 
     } else { 
-        selectedItems.push({ name: itemsData[inputName].name, quantity });
+      selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
 
     updateItemsList();
@@ -374,21 +372,20 @@ document.getElementById("add-item").addEventListener("click", () => {
   }
 });
 
-// ------------------------ Update Items List ------------------------
 function updateItemsList(){
   const listDiv = document.getElementById("items-list");
-  listDiv.innerHTML="";
-  selectedItems.forEach((item,index)=>{
+  listDiv.innerHTML = "";
+  selectedItems.forEach((item,index) => {
     const itemDiv = document.createElement("div");
     itemDiv.classList.add("selected-item");
 
     const removeBtn = document.createElement("button");
-    removeBtn.textContent="X";
+    removeBtn.textContent = "X";
     removeBtn.classList.add("button-bubble-small","remove-btn");
-    removeBtn.addEventListener("click",()=>{ 
-      selectedItems.splice(index,1); 
-      updateItemsList(); 
-      calculateQuote(); 
+    removeBtn.addEventListener("click", ()=> {
+      selectedItems.splice(index,1);
+      updateItemsList();
+      calculateQuote();
     });
 
     const nameSpan = document.createElement("span");
@@ -399,12 +396,12 @@ function updateItemsList(){
     qtySpan.textContent = item.quantity;
     qtySpan.classList.add("item-quantity");
 
-    itemDiv.append(removeBtn,nameSpan,qtySpan);
+    itemDiv.append(removeBtn, nameSpan, qtySpan);
     listDiv.appendChild(itemDiv);
   });
 }
 
-// ------------------------ Autocomplete ------------------------
+// ------------------------ Autocomplete for addresses ------------------------
 async function getAutocompleteSuggestions(query) {
   if (!query) return [];
   const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
@@ -415,7 +412,7 @@ async function getAutocompleteSuggestions(query) {
 function setupAutocomplete(inputEl, dropdownEl) {
   inputEl.addEventListener("input", async () => {
     const val = inputEl.value.trim();
-    if(!val) {
+    if(!val){
       dropdownEl.style.display = "none";
       travelData = { minutes: 0, distanceMeters: 0 };
       calculateQuote(false);
@@ -424,7 +421,8 @@ function setupAutocomplete(inputEl, dropdownEl) {
 
     const suggestions = await getAutocompleteSuggestions(val);
     dropdownEl.innerHTML = "";
-    suggestions.forEach(s=>{
+
+    suggestions.forEach(s => {
       const div = document.createElement("div");
       div.classList.add("dropdown-item");
       div.textContent = s.description;
@@ -432,7 +430,7 @@ function setupAutocomplete(inputEl, dropdownEl) {
       div.addEventListener("click", async () => {
         inputEl.value = s.description;
         dropdownEl.style.display = "none";
-        await calculateTravelIfReady(); // recalc quote immediately
+        await calculateTravelIfReady();
       });
 
       dropdownEl.appendChild(div);
@@ -441,7 +439,7 @@ function setupAutocomplete(inputEl, dropdownEl) {
     dropdownEl.style.display = suggestions.length ? "block" : "none";
   });
 
-  document.addEventListener("click", (e)=>{
+  document.addEventListener("click", (e) => {
     if(!inputEl.contains(e.target) && !dropdownEl.contains(e.target)){
       dropdownEl.style.display = "none";
     }
@@ -451,14 +449,7 @@ function setupAutocomplete(inputEl, dropdownEl) {
 setupAutocomplete(loadInput, document.getElementById("load-dropdown"));
 setupAutocomplete(unloadInput, document.getElementById("unload-dropdown"));
 
-// ------------------------ Travel Inputs ------------------------
-[loadInput, unloadInput].forEach(input => {
-  input.addEventListener("input", () => {
-    calculateTravelIfReady(); // call immediately on every change
-  });
-});
-
-// ------------------------ Calculate Travel ------------------------
+// ------------------------ Calculate travel ------------------------
 async function calculateTravelIfReady() {
   const origin = loadInput.value.trim();
   const destination = unloadInput.value.trim();
@@ -473,7 +464,7 @@ async function calculateTravelIfReady() {
     const res = await fetch(`/api/distance?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`);
     const data = await res.json();
 
-    if(data.rows && data.rows[0].elements[0].status==="OK"){
+    if(data.rows && data.rows[0].elements[0].status === "OK"){
       const element = data.rows[0].elements[0];
       travelData.minutes = element.duration.value; // seconds
       travelData.distanceMeters = element.distance.value;
@@ -483,39 +474,44 @@ async function calculateTravelIfReady() {
       calculateQuote(false);
     }
   } catch(err){
-    console.error("Error calculating travel time:", err);
+    console.error("Error fetching travel:", err);
     travelData = { minutes: 0, distanceMeters: 0 };
     calculateQuote(false);
   }
 }
 
-// ------------------------ Crew Buttons ------------------------
-document.querySelectorAll(".crew-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".crew-btn").forEach(b=>b.classList.remove("active"));
+// Trigger travel calculation whenever address changes
+[loadInput, unloadInput].forEach(input => {
+  input.addEventListener("input", calculateTravelIfReady);
+});
+
+// ------------------------ Crew and trailer buttons ------------------------
+document.querySelectorAll(".crew-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".crew-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     numMen = parseInt(btn.dataset.men);
     calculateQuote();
   });
 });
 
-document.querySelectorAll(".trailer-btn").forEach(btn=>{
-  btn.addEventListener("click", ()=>{
-    document.querySelectorAll(".trailer-btn").forEach(b=>b.classList.remove("active"));
+document.querySelectorAll(".trailer-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".trailer-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     selectedTrailer = btn.dataset.trailer;
-    calculateQuote(); 
+    calculateQuote();
   });
 });
 
 // ------------------------ Helpers ------------------------
 function formatTime(minutes){
   const h = Math.floor(minutes/60);
-  const m = minutes % 60;
+  const m = Math.round(minutes % 60);
   return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
 
-// ------------------------ Calculate Quote ------------------------
+// ------------------------ Calculate quote ------------------------
 function calculateQuote(includeTravel=false){
   let totalCuFt = 0;
 
@@ -546,13 +542,10 @@ function calculateQuote(includeTravel=false){
   // Travel time in minutes
   let travelMinutes = 0;
   let totalDistanceMeters = 0;
-  if(includeTravel){
-    if(!isNaN(travelData.minutes)){
-      travelMinutes = (Number(travelData.minutes)/60) * ((2*trips)-1);
-    }
-    if(!isNaN(travelData.distanceMeters)){
-      totalDistanceMeters = Number(travelData.distanceMeters) * ((2*trips)-1);
-    }
+  if(includeTravel && travelData.minutes && travelData.distanceMeters){
+    const travelMinutesPerTrip = travelData.minutes / 60; 
+    travelMinutes = travelMinutesPerTrip * ((2*trips)-1);
+    totalDistanceMeters = travelData.distanceMeters * ((2*trips)-1);
   }
 
   const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
@@ -563,7 +556,7 @@ function calculateQuote(includeTravel=false){
   if(numMen===4) crewHourlyRate=200;
 
   const quote = totalHours * crewHourlyRate;
-  const totalDistanceKm = totalDistanceMeters/1000;
+  const totalDistanceKm = totalDistanceMeters / 1000;
 
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
