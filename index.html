@@ -95,30 +95,6 @@ input::placeholder {
 .button-bubble:active {
     background: linear-gradient(145deg, #3a8dff, #6cc1ff); 
 }
-input + .dropdown {
-  width: 100%;
-  max-height: 200px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  position: absolute;
-  top: 100%;
-  left: 0;
-  overflow-y: auto;
-  z-index: 200;
-  font-size: 16px;
-}
-input + .dropdown .dropdown-item {
-  padding: 8px 10px;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(0,0,0,0.05);
-}
-input + .dropdown .dropdown-item:last-child {
-  border-bottom: none;
-}
-input + .dropdown .dropdown-item:hover {
-  background: #e6f0ff;
-}
 .calculate-button {
   display: flex;
   align-items: center; 
@@ -304,7 +280,9 @@ input + .dropdown .dropdown-item:hover {
 
 <div id="unload-input" class="input-container">
   <input type="text" id="load-address" placeholder="load address..." autocomplete="off">
+   <div id="load-dropdown" class="dropdown"></div>
   <input type="text" id="unload-address" placeholder="unload address..." autocomplete="off">
+   <div id="unload-dropdown" class="dropdown"></div>
   <button id="calculate-route" class="calculate-button button-bubble">Calculate</button>
 </div>
 
@@ -462,26 +440,16 @@ async function getAutocompleteSuggestions(query) {
   return data.predictions || [];
 }
 
-function setupAutocomplete(inputEl) {
-  // Make sure parent is relative
-  inputEl.parentNode.style.position = "relative";
-
-  // Create dropdown
-  const dropdown = document.createElement("div");
-  dropdown.classList.add("dropdown");
-  dropdown.style.display = "none"; // hide initially
-  inputEl.parentNode.appendChild(dropdown);
-
+function setupAutocomplete(inputEl, dropdownEl) {
   inputEl.addEventListener("input", async () => {
     const val = inputEl.value.trim();
     if (!val) {
-      dropdown.style.display = "none";
+      dropdownEl.style.display = "none";
       return;
     }
 
     const suggestions = await getAutocompleteSuggestions(val);
-    console.log("Suggestions:", suggestions); // debug
-    dropdown.innerHTML = "";
+    dropdownEl.innerHTML = "";
 
     suggestions.forEach(s => {
       const div = document.createElement("div");
@@ -489,25 +457,25 @@ function setupAutocomplete(inputEl) {
       div.textContent = s.description;
       div.addEventListener("click", () => {
         inputEl.value = s.description;
-        dropdown.style.display = "none";
+        dropdownEl.style.display = "none";
       });
-      dropdown.appendChild(div);
+      dropdownEl.appendChild(div);
     });
 
-    dropdown.style.display = suggestions.length ? "block" : "none";
+    dropdownEl.style.display = suggestions.length ? "block" : "none";
   });
 
-  // Hide dropdown on outside click
   document.addEventListener("click", (e) => {
-    if (!inputEl.contains(e.target) && !dropdown.contains(e.target)) {
-      dropdown.style.display = "none";
+    if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
+      dropdownEl.style.display = "none";
     }
   });
 }
 
 // Initialize
-setupAutocomplete(loadInput);
-setupAutocomplete(unloadInput);
+setupAutocomplete(loadInput, document.getElementById("load-dropdown"));
+setupAutocomplete(unloadInput, document.getElementById("unload-dropdown"));
+
 
 
 // ------------------------ Calculate Route ------------------------
