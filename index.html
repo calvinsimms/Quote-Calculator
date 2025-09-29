@@ -479,36 +479,47 @@ async function getAutocompleteSuggestions(query) {
 function setupAutocomplete(inputEl, dropdownEl) {
   const debouncedFetch = debounce(async (val) => {
     if (val.length < 3) {
-      dropdownEl.style.display = "none";
+      dropdownEl.innerHTML = "";
+      const infoDiv = document.createElement("div");
+      infoDiv.classList.add("dropdown-item");
+      infoDiv.style.color = '#888';
+      infoDiv.textContent = "Type to search...";
+      dropdownEl.appendChild(infoDiv);
+      dropdownEl.style.display = "block";
       return;
     }
 
     const suggestions = await getAutocompleteSuggestions(val);
     dropdownEl.innerHTML = "";
 
-    suggestions.forEach(s => {
-      const div = document.createElement("div");
-      div.classList.add("dropdown-item");
-      div.textContent = s.description;
-      div.addEventListener("click", () => {
-        inputEl.value = s.description;
-        dropdownEl.style.display = "none";
+    if (suggestions.length === 0) {
+      const noDiv = document.createElement("div");
+      noDiv.classList.add("dropdown-item");
+      noDiv.style.color = '#888';
+      noDiv.textContent = "No results";
+      dropdownEl.appendChild(noDiv);
+    } else {
+      suggestions.forEach(s => {
+        const div = document.createElement("div");
+        div.classList.add("dropdown-item");
+        div.textContent = s.description;
+        div.addEventListener("click", () => {
+          inputEl.value = s.description;
+          dropdownEl.style.display = "none";
+        });
+        dropdownEl.appendChild(div);
       });
-      dropdownEl.appendChild(div);
-    });
+    }
 
-    dropdownEl.style.display = suggestions.length ? "block" : "none";
+    dropdownEl.style.display = "block";
   }, 300);
 
   inputEl.addEventListener("input", () => {
     debouncedFetch(inputEl.value.trim());
   });
 
-  // Show dropdown on focus if value is already >=3 chars
   inputEl.addEventListener("focus", () => {
-    if (inputEl.value.trim().length >= 3) {
-      debouncedFetch(inputEl.value.trim());
-    }
+    debouncedFetch(inputEl.value.trim());
   });
 
   // Hide dropdown when clicking outside
