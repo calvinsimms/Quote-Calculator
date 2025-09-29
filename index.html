@@ -290,11 +290,14 @@ let itemsData = {};
 let itemsList = [];
 let selectedItems = [];
 let numMen = 2;
+let selectedTrailer = "Small Trailer";
 let travelData = { minutes: 0, distanceMeters: 0 }; 
 
 const searchInput = document.getElementById("item-select");
 const dropdown = document.getElementById("dropdown");
 const quantityInput = document.getElementById("item-quantity");
+const loadInput = document.getElementById("load-address");
+const unloadInput = document.getElementById("unload-address");
 
 // ------------------------ Load Google Sheets data ------------------------
 async function loadItemsData() {
@@ -323,14 +326,13 @@ function updateDropdown(filterValue) {
   dropdown.innerHTML = "";
 
   let matches = itemsList.filter(item => item.toLowerCase().includes(val));
+  matches.sort((a,b)=> a.localeCompare(b));
 
-  matches.sort((a, b) => a.localeCompare(b));
-
-  matches.forEach(item => {
+  matches.forEach(item=>{
     const div = document.createElement("div");
     div.classList.add("dropdown-item");
     div.textContent = item;
-    div.addEventListener("click", () => { 
+    div.addEventListener("click", ()=>{ 
       searchInput.value = item; 
       dropdown.style.display = "none"; 
     });
@@ -340,15 +342,15 @@ function updateDropdown(filterValue) {
   dropdown.style.display = matches.length ? "block" : "none";
 }
 
-searchInput.addEventListener("focus", () => {
-    searchInput.value = "";  
-    if (itemsList.length > 0) updateDropdown("");     
+searchInput.addEventListener("focus", ()=>{ 
+  searchInput.value = ""; 
+  if(itemsList.length>0) updateDropdown(""); 
 });
 
-searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
+searchInput.addEventListener("input", ()=> updateDropdown(searchInput.value));
 
-document.addEventListener("click", e => { 
-  if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+document.addEventListener("click", e=>{
+  if(!searchInput.contains(e.target) && !dropdown.contains(e.target)){
     dropdown.style.display = "none";
   }
 });
@@ -359,7 +361,7 @@ document.getElementById("add-item").addEventListener("click", () => {
   const quantity = parseInt(quantityInput.value) || 0;
 
   if(quantity > 0 && itemsData[inputName]){
-    let existing = selectedItems.find(i => i.name.toLowerCase() === inputName);
+    let existing = selectedItems.find(i=> i.name.toLowerCase() === inputName);
     if(existing){ 
         existing.quantity += quantity; 
     } else { 
@@ -402,10 +404,7 @@ function updateItemsList(){
   });
 }
 
-// ------------------------ Autocomplete ------------------------
-const loadInput = document.getElementById("load-address");
-const unloadInput = document.getElementById("unload-address");
-
+// ------------------------ Autocomplete Helper ------------------------
 async function getAutocompleteSuggestions(query) {
   if (!query) return [];
   const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
@@ -416,19 +415,18 @@ async function getAutocompleteSuggestions(query) {
 function setupAutocomplete(inputEl, dropdownEl) {
   inputEl.addEventListener("input", async () => {
     const val = inputEl.value.trim();
-    if (!val) {
+    if(!val) {
       dropdownEl.style.display = "none";
       return;
     }
 
     const suggestions = await getAutocompleteSuggestions(val);
     dropdownEl.innerHTML = "";
-
-    suggestions.forEach(s => {
+    suggestions.forEach(s=>{
       const div = document.createElement("div");
       div.classList.add("dropdown-item");
       div.textContent = s.description;
-      div.addEventListener("click", () => {
+      div.addEventListener("click", ()=> {
         inputEl.value = s.description;
         dropdownEl.style.display = "none";
       });
@@ -438,8 +436,8 @@ function setupAutocomplete(inputEl, dropdownEl) {
     dropdownEl.style.display = suggestions.length ? "block" : "none";
   });
 
-  document.addEventListener("click", (e) => {
-    if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
+  document.addEventListener("click",(e)=>{
+    if(!inputEl.contains(e.target) && !dropdownEl.contains(e.target)){
       dropdownEl.style.display = "none";
     }
   });
@@ -448,12 +446,12 @@ function setupAutocomplete(inputEl, dropdownEl) {
 setupAutocomplete(loadInput, document.getElementById("load-dropdown"));
 setupAutocomplete(unloadInput, document.getElementById("unload-dropdown"));
 
-// ------------------------ Debounce Helper ------------------------
-function debounce(func, delay) {
+// ------------------------ Debounce ------------------------
+function debounce(func, delay){
   let timeout;
-  return (...args) => {
+  return (...args)=>{
     clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), delay);
+    timeout = setTimeout(()=>func(...args), delay);
   };
 }
 
@@ -462,47 +460,50 @@ async function calculateTravelIfReady() {
   const origin = loadInput.value.trim();
   const destination = unloadInput.value.trim();
 
-  if (!origin || !destination) return;
+  if(!origin || !destination){
+    travelData = { minutes: 0, distanceMeters: 0 };
+    calculateQuote(false);
+    return;
+  }
 
   try {
     const res = await fetch(`/api/distance?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`);
     const data = await res.json();
 
-    if (data.rows && data.rows[0].elements[0].status === "OK") {
+    if(data.rows && data.rows[0].elements[0].status==="OK"){
       const element = data.rows[0].elements[0];
-      travelData.minutes = element.duration.value / 60; 
+      travelData.minutes = element.duration.value; // seconds
       travelData.distanceMeters = element.distance.value;
-
       calculateQuote(true);
+    } else {
+      travelData = { minutes: 0, distanceMeters: 0 };
+      calculateQuote(false);
     }
-  } catch (err) {
+  } catch(err){
     console.error("Error calculating travel time:", err);
+    travelData = { minutes: 0, distanceMeters: 0 };
+    calculateQuote(false);
   }
 }
 
 const debouncedCalculateTravel = debounce(calculateTravelIfReady, 500);
-
-[loadInput, unloadInput].forEach(input => {
-  input.addEventListener("input", () => {
-    debouncedCalculateTravel();
-  });
+[loadInput, unloadInput].forEach(input=>{
+  input.addEventListener("input", debouncedCalculateTravel);
 });
 
 // ------------------------ Crew Buttons ------------------------
-document.querySelectorAll(".crew-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".crew-btn").forEach(b => b.classList.remove("active"));
+document.querySelectorAll(".crew-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".crew-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     numMen = parseInt(btn.dataset.men);
     calculateQuote();
   });
 });
 
-let selectedTrailer = "Small Trailer"; 
-
-document.querySelectorAll(".trailer-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".trailer-btn").forEach(b => b.classList.remove("active"));
+document.querySelectorAll(".trailer-btn").forEach(btn=>{
+  btn.addEventListener("click", ()=>{
+    document.querySelectorAll(".trailer-btn").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     selectedTrailer = btn.dataset.trailer;
     calculateQuote(); 
@@ -510,73 +511,62 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
 });
 
 // ------------------------ Helpers ------------------------
-function formatTime(minutes){ 
-  const h=Math.floor(minutes/60); 
-  const m=minutes%60; 
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`; 
+function formatTime(minutes){
+  const h = Math.floor(minutes/60);
+  const m = minutes % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
 }
 
 // ------------------------ Calculate Quote ------------------------
-function calculateQuote(includeTravel = false) {
+function calculateQuote(includeTravel=false){
   let totalCuFt = 0;
-  let travelMinutes = 0;
-  let totalDistanceMeters = 0;
 
-  // Sum total cubic feet for all selected items
-  selectedItems.forEach(item => {
+  selectedItems.forEach(item=>{
     const key = item.name.toLowerCase();
-    if (itemsData[key]) {
+    if(itemsData[key]){
       totalCuFt += itemsData[key].cubicFeet * item.quantity;
     }
   });
 
-  // Trailer capacities
   const trailerSizes = { "Small Trailer": 670, "Large Trailer": 750, "Both Trailers": 1420 };
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
 
-  // Ensure at least 1 trip
   const trips = Math.max(1, Math.ceil(totalCuFt / trailerCapacity));
-
-  // Trailer usage percentage
   const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100;
 
-  // Load/unload calculations
   const avgTrailerSize = 710;
-  const baseTimePerFullTrailer = 150; // minutes
+  const baseTimePerFullTrailer = 150;
   let crewFactor = 1.0;
-  if (numMen === 3) crewFactor = 0.8;
-  if (numMen === 4) crewFactor = 0.6;
+  if(numMen===3) crewFactor=0.8;
+  if(numMen===4) crewFactor=0.6;
 
   const trailerEquivalents = totalCuFt / avgTrailerSize;
   const loadTimeOneTrip = baseTimePerFullTrailer * trailerEquivalents * crewFactor;
   const unloadTimeOneTrip = loadTimeOneTrip;
   const totalLoadUnloadTime = (loadTimeOneTrip + unloadTimeOneTrip) * trips;
 
-  // Include travel time if requested
-  if (includeTravel) {
-    if (!isNaN(travelData.minutes)) {
-      const minutesPerTrip = Number(travelData.minutes);
-      travelMinutes = minutesPerTrip * ((2 * trips) - 1); // round trips minus last return
+  // Travel time in minutes
+  let travelMinutes = 0;
+  let totalDistanceMeters = 0;
+  if(includeTravel){
+    if(!isNaN(travelData.minutes)){
+      travelMinutes = (Number(travelData.minutes)/60) * ((2*trips)-1);
     }
-    if (!isNaN(travelData.distanceMeters)) {
-      const distancePerTrip = Number(travelData.distanceMeters);
-      totalDistanceMeters = distancePerTrip * ((2 * trips) - 1);
+    if(!isNaN(travelData.distanceMeters)){
+      totalDistanceMeters = Number(travelData.distanceMeters) * ((2*trips)-1);
     }
   }
 
-  // Total time
   const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
   const totalHours = totalMinutesIncludingTravel / 60;
 
-  // Crew hourly rate
   let crewHourlyRate = 120;
-  if (numMen === 3) crewHourlyRate = 160;
-  if (numMen === 4) crewHourlyRate = 200;
+  if(numMen===3) crewHourlyRate=160;
+  if(numMen===4) crewHourlyRate=200;
 
   const quote = totalHours * crewHourlyRate;
-  const totalDistanceKm = totalDistanceMeters / 1000;
+  const totalDistanceKm = totalDistanceMeters/1000;
 
-  // Display results
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
@@ -591,8 +581,7 @@ function calculateQuote(includeTravel = false) {
   `;
 }
 
-
-// ------------------------ Initial Display ------------------------
+// ------------------------ Initialize ------------------------
 loadItemsData();
 calculateQuote();
 </script>
