@@ -169,7 +169,7 @@ input::placeholder {
 .dropdown {
   position: absolute;
   top: calc(100% + 5px); 
-  width: 301px; 
+  width: 100%; 
   max-height: 250px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 25px;
@@ -267,16 +267,19 @@ input::placeholder {
 <h1>Quote Calculator</h1>
 
 <div id="item-inputs" class="input-container">
-    <div style="display: flex; width: 100%; align-items: center; gap: 5px;">
-        <input type="text" id="item-select" placeholder="select item..." autocomplete="off" style="flex: 1;">
-        <div style="display: flex; gap: 5px; align-items: center;">
-            <input type="number" id="item-quantity" value="1" min="1" class="small-input">
-            <button id="add-item" class="small-button button-bubble">+</button>
-        </div>
+  <div style="position: relative; width: 100%; display: flex; align-items: center; gap: 5px;">
+    <input type="text" id="item-select" placeholder="select item..." autocomplete="off" style="flex: 1;">
+    <div style="display: flex; gap: 5px; align-items: center;">
+      <input type="number" id="item-quantity" value="1" min="1" class="small-input">
+      <button id="add-item" class="small-button button-bubble">+</button>
     </div>
+    
     <div id="dropdown" class="dropdown"></div>
-    <div id="items-list"></div>
+  </div>
+
+  <div id="items-list"></div>
 </div>
+
 
 <div id="unload-input" class="input-container">
   <div style="position: relative; width: 100%;">
