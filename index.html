@@ -404,10 +404,10 @@ document.getElementById("add-item").addEventListener("click", () => {
         selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
 
-    updateItemsList();
-    calculateQuote();
-    quantityInput.value = 1;
-    markButtonDirty(); 
+  updateItemsList();
+  calculateQuote();
+  quantityInput.value = 1;
+  // markButtonDirty(); // Only addresses should reset button
   }
 });
 
@@ -426,7 +426,7 @@ function updateItemsList(){
       selectedItems.splice(index,1); 
       updateItemsList(); 
       calculateQuote(); 
-      markButtonDirty(); 
+      // markButtonDirty(); // Only addresses should reset button
     });
 
     const nameSpan = document.createElement("span");
@@ -596,8 +596,8 @@ document.querySelectorAll(".crew-btn").forEach(btn => {
     document.querySelectorAll(".crew-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     numMen = parseInt(btn.dataset.men);
-    calculateQuote();
-    markButtonDirty(); 
+  calculateQuote();
+  // markButtonDirty(); // Only addresses should reset button
   });
 });
 
@@ -609,8 +609,8 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
     document.querySelectorAll(".trailer-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     selectedTrailer = btn.dataset.trailer;
-    calculateQuote(); 
-    markButtonDirty(); 
+  calculateQuote(); 
+  // markButtonDirty(); // Only addresses should reset button
   });
 });
 
