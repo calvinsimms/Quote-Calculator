@@ -28,11 +28,14 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
-    console.log('Google Routes API raw response:', JSON.stringify(data));
     const route = data.routes?.[0];
 
-    // Convert duration from seconds to minutes (rounded)
-    const durationMinutes = route?.duration?.seconds ? Math.round(route.duration.seconds / 60) : 0;
+    // Parse duration string (e.g., '500s') and convert to minutes
+    let durationMinutes = 0;
+    if (route?.duration && typeof route.duration === 'string') {
+      const match = route.duration.match(/(\d+)s/);
+      if (match) durationMinutes = Math.round(parseInt(match[1], 10) / 60);
+    }
     const formatted = {
       rows: [
         {
@@ -46,7 +49,6 @@ export default async function handler(req, res) {
         }
       ]
     };
-    console.log('Formatted distance API response:', JSON.stringify(formatted));
 
     global.distanceCache[key] = formatted;
     res.json(formatted);

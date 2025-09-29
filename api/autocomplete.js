@@ -22,10 +22,6 @@ export default async function handler(req, res) {
       }),
     });
     const data = await apiRes.json();
-    console.log('Google Places API (New) raw response:', JSON.stringify(data));
-    if (data.error) {
-      console.error('Google Places API (New) error:', data.error);
-    }
     // Filter suggestions to only Canadian addresses
     const predictions = (data.suggestions || [])
       .filter(s => {
