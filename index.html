@@ -518,20 +518,31 @@ function formatTime(minutes){
 
 // ------------------------ Calculate Quote ------------------------
 function calculateQuote(includeTravel = false) {
-  let totalCuFt = 0, quote = 0;
+  let totalCuFt = 0;
   let travelMinutes = 0;
   let totalDistanceMeters = 0;
 
-  selectedItems.forEach(i => totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity);
+  // Sum total cubic feet for all selected items
+  selectedItems.forEach(item => {
+    const key = item.name.toLowerCase();
+    if (itemsData[key]) {
+      totalCuFt += itemsData[key].cubicFeet * item.quantity;
+    }
+  });
 
+  // Trailer capacities
   const trailerSizes = { "Small Trailer": 670, "Large Trailer": 750, "Both Trailers": 1420 };
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
-  const trips = Math.ceil(totalCuFt / trailerCapacity);
 
+  // Ensure at least 1 trip
+  const trips = Math.max(1, Math.ceil(totalCuFt / trailerCapacity));
+
+  // Trailer usage percentage
   const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100;
 
+  // Load/unload calculations
   const avgTrailerSize = 710;
-  const baseTimePerFullTrailer = 150;
+  const baseTimePerFullTrailer = 150; // minutes
   let crewFactor = 1.0;
   if (numMen === 3) crewFactor = 0.8;
   if (numMen === 4) crewFactor = 0.6;
@@ -541,21 +552,31 @@ function calculateQuote(includeTravel = false) {
   const unloadTimeOneTrip = loadTimeOneTrip;
   const totalLoadUnloadTime = (loadTimeOneTrip + unloadTimeOneTrip) * trips;
 
+  // Include travel time if requested
   if (includeTravel) {
-    if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
-    if (!isNaN(travelData.distanceMeters)) totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
+    if (!isNaN(travelData.minutes)) {
+      const minutesPerTrip = Number(travelData.minutes);
+      travelMinutes = minutesPerTrip * ((2 * trips) - 1); // round trips minus last return
+    }
+    if (!isNaN(travelData.distanceMeters)) {
+      const distancePerTrip = Number(travelData.distanceMeters);
+      totalDistanceMeters = distancePerTrip * ((2 * trips) - 1);
+    }
   }
 
+  // Total time
   const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
   const totalHours = totalMinutesIncludingTravel / 60;
 
+  // Crew hourly rate
   let crewHourlyRate = 120;
   if (numMen === 3) crewHourlyRate = 160;
   if (numMen === 4) crewHourlyRate = 200;
 
-  quote = totalHours * crewHourlyRate;
+  const quote = totalHours * crewHourlyRate;
   const totalDistanceKm = totalDistanceMeters / 1000;
 
+  // Display results
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
@@ -569,6 +590,7 @@ function calculateQuote(includeTravel = false) {
     <div class="totals-quote">$${quote.toFixed(2)}</div>
   `;
 }
+
 
 // ------------------------ Initial Display ------------------------
 loadItemsData();
