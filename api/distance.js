@@ -1,4 +1,4 @@
-export default async function handler(req, res) {
+async function handler(req, res) {
   const { origin, destination } = req.query;
 
   if (!origin || !destination) {
@@ -7,6 +7,7 @@ export default async function handler(req, res) {
 
   try {
     const apiKey = process.env.GOOGLE_API_KEY;
+
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&mode=driving&key=${apiKey}`
     );
@@ -19,5 +20,7 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Error fetching travel time" });
   }
 }
+
+module.exports = handler;
 
 
