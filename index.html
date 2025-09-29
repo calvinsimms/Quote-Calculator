@@ -95,6 +95,30 @@ input::placeholder {
 .button-bubble:active {
     background: linear-gradient(145deg, #3a8dff, #6cc1ff); 
 }
+input + .dropdown {
+  width: 100%;
+  max-height: 200px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  overflow-y: auto;
+  z-index: 200;
+  font-size: 16px;
+}
+input + .dropdown .dropdown-item {
+  padding: 8px 10px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+input + .dropdown .dropdown-item:last-child {
+  border-bottom: none;
+}
+input + .dropdown .dropdown-item:hover {
+  background: #e6f0ff;
+}
 .calculate-button {
   display: flex;
   align-items: center; 
@@ -432,24 +456,33 @@ const loadInput = document.getElementById("load-address");
 const unloadInput = document.getElementById("unload-address");
 
 async function getAutocompleteSuggestions(query) {
+  if (!query) return [];
   const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
   const data = await res.json();
   return data.predictions || [];
 }
 
 function setupAutocomplete(inputEl) {
+  // Make sure parent is relative
+  inputEl.parentNode.style.position = "relative";
+
+  // Create dropdown
   const dropdown = document.createElement("div");
   dropdown.classList.add("dropdown");
+  dropdown.style.display = "none"; // hide initially
   inputEl.parentNode.appendChild(dropdown);
 
   inputEl.addEventListener("input", async () => {
-    const val = inputEl.value;
+    const val = inputEl.value.trim();
     if (!val) {
       dropdown.style.display = "none";
       return;
     }
+
     const suggestions = await getAutocompleteSuggestions(val);
+    console.log("Suggestions:", suggestions); // debug
     dropdown.innerHTML = "";
+
     suggestions.forEach(s => {
       const div = document.createElement("div");
       div.classList.add("dropdown-item");
@@ -460,9 +493,11 @@ function setupAutocomplete(inputEl) {
       });
       dropdown.appendChild(div);
     });
+
     dropdown.style.display = suggestions.length ? "block" : "none";
   });
 
+  // Hide dropdown on outside click
   document.addEventListener("click", (e) => {
     if (!inputEl.contains(e.target) && !dropdown.contains(e.target)) {
       dropdown.style.display = "none";
@@ -470,8 +505,10 @@ function setupAutocomplete(inputEl) {
   });
 }
 
+// Initialize
 setupAutocomplete(loadInput);
 setupAutocomplete(unloadInput);
+
 
 // ------------------------ Calculate Route ------------------------
 const calculateBtn = document.getElementById("calculate-route");
@@ -496,6 +533,7 @@ document.getElementById("calculate-route").addEventListener("click", async () =>
       const travelTimeMinutes = Math.round(element.duration.value / 60); 
       const travelDistanceMeters = element.distance.value; 
 
+      // store values
       let travelInput = document.getElementById("travel-minutes");
       if (!travelInput) {
         travelInput = document.createElement("input");
@@ -516,6 +554,7 @@ document.getElementById("calculate-route").addEventListener("click", async () =>
 
       calculateQuote(true);
 
+      // ✅ Mark button as calculated
       calculateBtn.classList.add("calculated");
 
     } else {
