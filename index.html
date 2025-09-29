@@ -437,6 +437,7 @@ async function getAutocompleteSuggestions(query) {
   if (!query) return [];
   const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
   const data = await res.json();
+  console.log("Autocomplete API response:", data);
   return data.predictions || [];
 }
 
