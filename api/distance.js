@@ -28,6 +28,7 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+    console.log('Google Routes API raw response:', JSON.stringify(data));
     const route = data.routes?.[0];
 
     // Convert duration from seconds to minutes (rounded)
@@ -45,6 +46,7 @@ export default async function handler(req, res) {
         }
       ]
     };
+    console.log('Formatted distance API response:', JSON.stringify(formatted));
 
     global.distanceCache[key] = formatted;
     res.json(formatted);
