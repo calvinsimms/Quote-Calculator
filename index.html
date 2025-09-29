@@ -315,7 +315,6 @@ async function loadItemsData() {
   });
 
   itemsList = Object.values(itemsData).map(i => i.name);
-
   updateItemsList();
   calculateQuote();
 }
@@ -332,9 +331,10 @@ function updateDropdown(filterValue) {
     const div = document.createElement("div");
     div.classList.add("dropdown-item");
     div.textContent = item;
-    div.addEventListener("click", ()=>{ 
+    div.addEventListener("click", async () => { 
       searchInput.value = item; 
       dropdown.style.display = "none"; 
+      calculateQuote(); // immediately recalc quote
     });
     dropdown.appendChild(div);
   });
@@ -404,7 +404,7 @@ function updateItemsList(){
   });
 }
 
-// ------------------------ Autocomplete Helper ------------------------
+// ------------------------ Autocomplete ------------------------
 async function getAutocompleteSuggestions(query) {
   if (!query) return [];
   const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
@@ -417,6 +417,8 @@ function setupAutocomplete(inputEl, dropdownEl) {
     const val = inputEl.value.trim();
     if(!val) {
       dropdownEl.style.display = "none";
+      travelData = { minutes: 0, distanceMeters: 0 };
+      calculateQuote(false);
       return;
     }
 
@@ -426,17 +428,20 @@ function setupAutocomplete(inputEl, dropdownEl) {
       const div = document.createElement("div");
       div.classList.add("dropdown-item");
       div.textContent = s.description;
-      div.addEventListener("click", ()=> {
+
+      div.addEventListener("click", async () => {
         inputEl.value = s.description;
         dropdownEl.style.display = "none";
+        await calculateTravelIfReady(); // recalc quote immediately
       });
+
       dropdownEl.appendChild(div);
     });
 
     dropdownEl.style.display = suggestions.length ? "block" : "none";
   });
 
-  document.addEventListener("click",(e)=>{
+  document.addEventListener("click", (e)=>{
     if(!inputEl.contains(e.target) && !dropdownEl.contains(e.target)){
       dropdownEl.style.display = "none";
     }
@@ -445,15 +450,6 @@ function setupAutocomplete(inputEl, dropdownEl) {
 
 setupAutocomplete(loadInput, document.getElementById("load-dropdown"));
 setupAutocomplete(unloadInput, document.getElementById("unload-dropdown"));
-
-// ------------------------ Debounce ------------------------
-function debounce(func, delay){
-  let timeout;
-  return (...args)=>{
-    clearTimeout(timeout);
-    timeout = setTimeout(()=>func(...args), delay);
-  };
-}
 
 // ------------------------ Calculate Travel ------------------------
 async function calculateTravelIfReady() {
@@ -485,11 +481,6 @@ async function calculateTravelIfReady() {
     calculateQuote(false);
   }
 }
-
-const debouncedCalculateTravel = debounce(calculateTravelIfReady, 500);
-[loadInput, unloadInput].forEach(input=>{
-  input.addEventListener("input", debouncedCalculateTravel);
-});
 
 // ------------------------ Crew Buttons ------------------------
 document.querySelectorAll(".crew-btn").forEach(btn=>{
@@ -584,6 +575,7 @@ function calculateQuote(includeTravel=false){
 // ------------------------ Initialize ------------------------
 loadItemsData();
 calculateQuote();
+
 </script>
 
 </body>
