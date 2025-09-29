@@ -110,6 +110,12 @@ input::placeholder {
   box-shadow: 0 1px 5px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
 }
+.calculate-button.calculated {
+  background: #d3d3d3;
+  color: #666;
+  cursor: default;
+  box-shadow: none;
+}
 #items-list {
   box-sizing: border-box;
   width: 290px;
@@ -221,7 +227,7 @@ input::placeholder {
 .trailer-container {
   display: flex;
   align-items: center;
-  width: 97%;
+  width: 98%;
 }
 
 .crew-container span,
@@ -278,9 +284,6 @@ input::placeholder {
   <button id="calculate-route" class="calculate-button button-bubble">Calculate</button>
 </div>
 
-
-<div id="totals" class="totals"></div>
-
 <div class="input-container" id="crew-buttons-container">
   <div class="crew-container">
     <span>Crew Size</span>
@@ -299,6 +302,9 @@ input::placeholder {
     </div>
   </div>
 </div>
+
+<div id="totals" class="totals"></div>
+
 
 
 <script>
@@ -421,6 +427,71 @@ function updateItemsList(){
   });
 }
 
+// ------------------------ Calculate Route ------------------------
+const calculateBtn = document.getElementById("calculate-route");
+const loadAddress = document.getElementById("load-address");
+const unloadAddress = document.getElementById("unload-address");
+
+// --- When Calculate is pressed and succeeds ---
+document.getElementById("calculate-route").addEventListener("click", async () => {
+  const origin = loadAddress.value.trim();
+  const destination = unloadAddress.value.trim();
+
+  if (!origin || !destination) {
+    alert("Please enter both load and unload addresses.");
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/distance?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`);
+    const data = await res.json();
+
+    if (data.rows && data.rows[0].elements[0].status === "OK") {
+      const element = data.rows[0].elements[0];
+      const travelTimeMinutes = Math.round(element.duration.value / 60); 
+      const travelDistanceMeters = element.distance.value; 
+
+      // store values
+      let travelInput = document.getElementById("travel-minutes");
+      if (!travelInput) {
+        travelInput = document.createElement("input");
+        travelInput.type = "hidden";
+        travelInput.id = "travel-minutes";
+        document.body.appendChild(travelInput);
+      }
+      travelInput.value = travelTimeMinutes;
+
+      let distanceInput = document.getElementById("travel-distance-meters");
+      if (!distanceInput) {
+        distanceInput = document.createElement("input");
+        distanceInput.type = "hidden";
+        distanceInput.id = "travel-distance-meters";
+        document.body.appendChild(distanceInput);
+      }
+      distanceInput.value = travelDistanceMeters;
+
+      calculateQuote(true);
+
+      // ✅ Mark button as calculated
+      calculateBtn.classList.add("calculated");
+
+    } else {
+      alert("Unable to calculate route. Check addresses.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error calculating travel time.");
+  }
+});
+
+// --- Reset button state when addresses change ---
+[loadAddress, unloadAddress].forEach(input => {
+  input.addEventListener("input", () => {
+    calculateBtn.classList.remove("calculated");
+  });
+});
+
+
 // ------------------------ Helpers ------------------------
 function formatTime(minutes){ 
   const h=Math.floor(minutes/60); 
@@ -458,9 +529,10 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
 });
 
 // ------------------------ Calculate Quote ------------------------
-function calculateQuote(includeTravel=false) {
+function calculateQuote(includeTravel = false) {
   let totalCuFt = 0, quote = 0;
-  let travelMinutes = 0; 
+  let travelMinutes = 0;
+  let totalDistanceMeters = 0;
 
   selectedItems.forEach(i => {
     totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity;
@@ -470,44 +542,55 @@ function calculateQuote(includeTravel=false) {
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
 
   const trips = Math.ceil(totalCuFt / trailerCapacity);
-  const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100; 
+  const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100;
 
   const avgTrailerSize = 710;
-  const baseTimePerFullTrailer = 150; 
-
+  const baseTimePerFullTrailer = 150;
   let crewFactor = 1.0;
   if (numMen === 3) crewFactor = 0.8;
   if (numMen === 4) crewFactor = 0.6;
 
   const trailerEquivalents = totalCuFt / avgTrailerSize;
-  const totalLoadTime = baseTimePerFullTrailer * trailerEquivalents * crewFactor;
+  const loadTimeOneTrip = baseTimePerFullTrailer * trailerEquivalents * crewFactor;
+  const unloadTimeOneTrip = loadTimeOneTrip;
+  const totalLoadUnloadTime = (loadTimeOneTrip + unloadTimeOneTrip) * trips;
 
   if (includeTravel) {
     const userTravel = parseInt(document.getElementById("travel-minutes")?.value);
-    if (!isNaN(userTravel)) travelMinutes = userTravel;
+    const userDistance = parseInt(document.getElementById("travel-distance-meters")?.value);
+
+    if (!isNaN(userTravel)) {
+      travelMinutes = userTravel * ((2 * trips) - 1); 
+    }
+    if (!isNaN(userDistance)) {
+      totalDistanceMeters = userDistance * ((2 * trips) - 1);
+    }
   }
 
-  const quoteTrips = Math.ceil(totalCuFt / trailerCapacity);
+  const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
+  const totalHours = totalMinutesIncludingTravel / 60;
 
-  const totalMinutesIncludingTravel = totalLoadTime + travelMinutes * quoteTrips;
-  const totalManHours = (totalMinutesIncludingTravel / 60) * numMen;
+  let crewHourlyRate = 120; 
+  if (numMen === 3) crewHourlyRate = 160;
+  if (numMen === 4) crewHourlyRate = 200;
 
-  const laborRatePerManHour = 60; 
-  quote = totalManHours * laborRatePerManHour;
+  quote = totalHours * crewHourlyRate;
+
+  const totalDistanceKm = totalDistanceMeters / 1000;
 
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
-    <div class="totals-row"><span>Crew Size</span><span>${numMen}</span></div>
-    <div class="totals-row"><span>${selectedTrailer} Trips</span><span>${trips}</span></div>
-    <div class="totals-row"><span>${selectedTrailer} Usage</span><span>${trailerUsagePercent.toFixed(1)}%</span></div>
-    <div class="totals-row"><span>Time</span><span>${formatTime(Math.round(totalMinutesIncludingTravel))}</span></div>
+    <div class="totals-row"><span>Trips</span><span>${trips}</span></div>
+    <div class="totals-row"><span>Trailer Usage</span><span>${trailerUsagePercent.toFixed(1)}%</span></div>
+    <div class="totals-row"><span>Work Time</span><span>${formatTime(Math.round(totalLoadUnloadTime))}</span></div>
+    <div class="totals-row"><span>Travel Time</span><span>${formatTime(Math.round(travelMinutes))}</span></div>
+    <div class="totals-row"><span>Total Distance</span><span>${totalDistanceKm.toFixed(1)} km</span></div>
+    <div class="totals-row"><span>Total Time</span><span>${formatTime(Math.round(totalMinutesIncludingTravel))}</span></div>
+    <div class="totals-row"><span>Rate</span><span>$${crewHourlyRate}/hr</span></div>
     <div class="totals-quote">$${quote.toFixed(2)}</div>
   `;
 }
-
-
-document.getElementById("calculate-route").addEventListener("click", () => calculateQuote(true));
 
 // ------------------------ Initial Display ------------------------
 loadItemsData();
