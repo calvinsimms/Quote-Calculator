@@ -115,8 +115,8 @@ input::placeholder {
   transition: all 0.3s ease;
 }
 .calculate-button.calculated {
-  background-color: #f5f5f5;
-  color: #b8b8b8;   
+  background: #d3d3d3;
+  color: #666;
   cursor: default;
   box-shadow: none;
 }
@@ -404,10 +404,10 @@ document.getElementById("add-item").addEventListener("click", () => {
         selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
 
-    updateItemsList();
-    calculateQuote();
-    quantityInput.value = 1;
-    markButtonDirty(); 
+  updateItemsList();
+  calculateQuote();
+  quantityInput.value = 1;
+  // markButtonDirty(); // Only addresses should reset button
   }
 });
 
@@ -426,7 +426,7 @@ function updateItemsList(){
       selectedItems.splice(index,1); 
       updateItemsList(); 
       calculateQuote(); 
-      markButtonDirty(); 
+      // markButtonDirty(); // Only addresses should reset button
     });
 
     const nameSpan = document.createElement("span");
@@ -479,36 +479,47 @@ async function getAutocompleteSuggestions(query) {
 function setupAutocomplete(inputEl, dropdownEl) {
   const debouncedFetch = debounce(async (val) => {
     if (val.length < 3) {
-      dropdownEl.style.display = "none";
+      dropdownEl.innerHTML = "";
+      const infoDiv = document.createElement("div");
+      infoDiv.classList.add("dropdown-item");
+      infoDiv.style.color = '#888';
+      infoDiv.textContent = "Type to search...";
+      dropdownEl.appendChild(infoDiv);
+      dropdownEl.style.display = "block";
       return;
     }
 
     const suggestions = await getAutocompleteSuggestions(val);
     dropdownEl.innerHTML = "";
 
-    suggestions.forEach(s => {
-      const div = document.createElement("div");
-      div.classList.add("dropdown-item");
-      div.textContent = s.description;
-      div.addEventListener("click", () => {
-        inputEl.value = s.description;
-        dropdownEl.style.display = "none";
+    if (suggestions.length === 0) {
+      const noDiv = document.createElement("div");
+      noDiv.classList.add("dropdown-item");
+      noDiv.style.color = '#888';
+      noDiv.textContent = "No results";
+      dropdownEl.appendChild(noDiv);
+    } else {
+      suggestions.forEach(s => {
+        const div = document.createElement("div");
+        div.classList.add("dropdown-item");
+        div.textContent = s.description;
+        div.addEventListener("click", () => {
+          inputEl.value = s.description;
+          dropdownEl.style.display = "none";
+        });
+        dropdownEl.appendChild(div);
       });
-      dropdownEl.appendChild(div);
-    });
+    }
 
-    dropdownEl.style.display = suggestions.length ? "block" : "none";
+    dropdownEl.style.display = "block";
   }, 300);
 
   inputEl.addEventListener("input", () => {
     debouncedFetch(inputEl.value.trim());
   });
 
-  // Show dropdown on focus if value is already >=3 chars
   inputEl.addEventListener("focus", () => {
-    if (inputEl.value.trim().length >= 3) {
-      debouncedFetch(inputEl.value.trim());
-    }
+    debouncedFetch(inputEl.value.trim());
   });
 
   // Hide dropdown when clicking outside
@@ -585,8 +596,8 @@ document.querySelectorAll(".crew-btn").forEach(btn => {
     document.querySelectorAll(".crew-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     numMen = parseInt(btn.dataset.men);
-    calculateQuote();
-    markButtonDirty(); 
+  calculateQuote();
+  // markButtonDirty(); // Only addresses should reset button
   });
 });
 
@@ -598,8 +609,8 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
     document.querySelectorAll(".trailer-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     selectedTrailer = btn.dataset.trailer;
-    calculateQuote(); 
-    markButtonDirty(); 
+  calculateQuote(); 
+  // markButtonDirty(); // Only addresses should reset button
   });
 });
 
@@ -629,11 +640,10 @@ function calculateQuote(includeTravel = false) {
   const totalLoadUnloadTime = baseTimePerFullTrailer * trailerEquivalents * crewFactor * 2;
 
   if (includeTravel) {
-    if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
+    if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes * ((2 * trips) - 1);
     if (!isNaN(travelData.distanceMeters)) totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
   } else {
-
-    travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
+    travelMinutes = travelData.minutes * ((2 * trips) - 1);
     totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
   }
 
