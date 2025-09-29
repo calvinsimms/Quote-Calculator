@@ -26,15 +26,19 @@ export default async function handler(req, res) {
     if (data.error) {
       console.error('Google Places API (New) error:', data.error);
     }
-    // The new API returns 'suggestions' array
-    // Map to the old format for frontend compatibility
-    const predictions = (data.suggestions || []).map(s => ({
-      description: s.placePrediction?.structuredFormat?.mainText?.text
-        ? `${s.placePrediction.structuredFormat.mainText.text}, ${s.placePrediction.structuredFormat.secondaryText.text}`
-        : s.placePrediction?.text?.text || '',
-      place_id: s.placePrediction.placeId,
-      // Add more fields if needed
-    }));
+    // Filter suggestions to only Canadian addresses
+    const predictions = (data.suggestions || [])
+      .filter(s => {
+        const sec = s.placePrediction?.structuredFormat?.secondaryText?.text || '';
+        return /canada/i.test(sec);
+      })
+      .map(s => ({
+        description: s.placePrediction?.structuredFormat?.mainText?.text
+          ? `${s.placePrediction.structuredFormat.mainText.text}, ${s.placePrediction.structuredFormat.secondaryText.text}`
+          : s.placePrediction?.text?.text || '',
+        place_id: s.placePrediction.placeId,
+        // Add more fields if needed
+      }));
     res.status(200).json({ predictions });
   } catch (err) {
     console.error('Places API (New) exception:', err);

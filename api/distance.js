@@ -30,13 +30,15 @@ export default async function handler(req, res) {
     const data = await response.json();
     const route = data.routes?.[0];
 
+    // Convert duration from seconds to minutes (rounded)
+    const durationMinutes = route?.duration?.seconds ? Math.round(route.duration.seconds / 60) : 0;
     const formatted = {
       rows: [
         {
           elements: [
             {
               status: route ? "OK" : "NOT_FOUND",
-              duration: { value: route?.duration?.seconds || 0 },
+              duration: { value: durationMinutes },
               distance: { value: route?.distanceMeters || 0 }
             }
           ]
