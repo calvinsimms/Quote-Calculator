@@ -641,11 +641,10 @@ function calculateQuote(includeTravel = false) {
   const totalLoadUnloadTime = (loadTimeOneTrip + unloadTimeOneTrip) * trips;
 
   if (includeTravel) {
-    if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
+    if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes * ((2 * trips) - 1);
     if (!isNaN(travelData.distanceMeters)) totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
   } else {
-
-    travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
+    travelMinutes = travelData.minutes * ((2 * trips) - 1);
     totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
   }
 
