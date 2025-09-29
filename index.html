@@ -169,7 +169,7 @@ input::placeholder {
 .dropdown {
   position: absolute;
   top: 49px;
-  width: 301px; 
+  width: 100%; 
   max-height: 250px;
   background: rgba(255, 255, 255, 0.5);
   border-radius: 25px;
@@ -279,10 +279,15 @@ input::placeholder {
 </div>
 
 <div id="unload-input" class="input-container">
-  <input type="text" id="load-address" placeholder="load address..." autocomplete="off">
-   <div id="load-dropdown" class="dropdown"></div>
-  <input type="text" id="unload-address" placeholder="unload address..." autocomplete="off">
-   <div id="unload-dropdown" class="dropdown"></div>
+  <div style="position: relative; width: 100%;">
+    <input type="text" id="load-address" placeholder="load address..." autocomplete="off">
+    <div id="load-dropdown" class="dropdown"></div>
+  </div>
+
+  <div style="position: relative; width: 100%;">
+    <input type="text" id="unload-address" placeholder="unload address..." autocomplete="off">
+    <div id="unload-dropdown" class="dropdown"></div>
+  </div>
   <button id="calculate-route" class="calculate-button button-bubble">Calculate</button>
 </div>
 
