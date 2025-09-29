@@ -242,9 +242,18 @@ input::placeholder {
 
 .button-group {
   display: flex;
-  gap: 10px;       
-  margin-left: auto; 
+  gap: 10px;
+  width: 100%;
+  margin-left: 0;
 }
+
+.button-group .crew-btn,
+.button-group .trailer-btn {
+  flex: 1 1 0;
+  width: auto;
+  min-width: 0;
+}
+
 
 .crew-btn,
 .trailer-btn {
@@ -301,20 +310,13 @@ input::placeholder {
 
 <div class="input-container" id="crew-buttons-container">
   <div class="crew-container">
-    <span>Crew Size</span>
-    <div class="button-group">
-      <button class="crew-btn active" data-men="2">2</button>
-      <button class="crew-btn" data-men="3">3</button>
-      <button class="crew-btn" data-men="4">4</button>
-    </div>
-  </div>
-
-  <div class="trailer-container">
-    <span>Trailer Size</span>
     <div class="button-group">
       <button class="trailer-btn active" data-trailer="Small Trailer">S</button>
       <button class="trailer-btn" data-trailer="Large Trailer">L</button>
       <button class="trailer-btn" data-trailer="Both Trailers">B</button>
+      <button class="crew-btn active" data-men="2">2</button>
+      <button class="crew-btn" data-men="3">3</button>
+      <button class="crew-btn" data-men="4">4</button>
     </div>
   </div>
 </div>
@@ -659,6 +661,8 @@ function calculateQuote(includeTravel = false) {
 
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
+    <div class="totals-row"><span>Trailer Selection</span><span>${selectedTrailer}</span></div>
+    <div class="totals-row"><span>Crew Size</span><span>${numMen}</span></div>
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
     <div class="totals-row"><span>Trips</span><span>${trips}</span></div>
     <div class="totals-row"><span>Trailer Usage</span><span>${trailerUsagePercent.toFixed(1)}%</span></div>
