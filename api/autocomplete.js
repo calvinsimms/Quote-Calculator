@@ -29,7 +29,9 @@ export default async function handler(req, res) {
     // The new API returns 'suggestions' array
     // Map to the old format for frontend compatibility
     const predictions = (data.suggestions || []).map(s => ({
-      description: s.formattedSuggestion,
+      description: s.placePrediction?.structuredFormat?.mainText?.text
+        ? `${s.placePrediction.structuredFormat.mainText.text}, ${s.placePrediction.structuredFormat.secondaryText.text}`
+        : s.placePrediction?.text?.text || '',
       place_id: s.placePrediction.placeId,
       // Add more fields if needed
     }));
