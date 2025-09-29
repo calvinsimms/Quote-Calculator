@@ -1,26 +1,55 @@
-async function handler(req, res) {
-  const { origin, destination } = req.query;
+export default async function handler(req, res) {
+  if (req.method !== "GET") return res.status(405).end();
 
+  const { origin, destination } = req.query;
   if (!origin || !destination) {
     return res.status(400).json({ error: "Missing origin or destination" });
   }
 
-  try {
-    const apiKey = process.env.GOOGLE_API_KEY;
+  const key = `${origin}-${destination}`;
+  if (!global.distanceCache) global.distanceCache = {};
+  if (global.distanceCache[key]) {
+    return res.json(global.distanceCache[key]);
+  }
 
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${encodeURIComponent(origin)}&destinations=${encodeURIComponent(destination)}&mode=driving&key=${apiKey}`
-    );
+  try {
+    const response = await fetch("https://routes.googleapis.com/directions/v2:computeRoutes", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": process.env.GOOGLE_API_KEY,
+        "X-Goog-FieldMask": "routes.duration,routes.distanceMeters"
+      },
+      body: JSON.stringify({
+        origin: { address: origin },
+        destination: { address: destination },
+        travelMode: "DRIVE"
+      })
+    });
 
     const data = await response.json();
+    const route = data.routes?.[0];
 
-    res.status(200).json(data);
+    const formatted = {
+      rows: [
+        {
+          elements: [
+            {
+              status: route ? "OK" : "NOT_FOUND",
+              duration: { value: route?.duration?.seconds || 0 },
+              distance: { value: route?.distanceMeters || 0 }
+            }
+          ]
+        }
+      ]
+    };
+
+    global.distanceCache[key] = formatted;
+    res.json(formatted);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Error fetching travel time" });
+    console.error("Distance error:", err);
+    res.status(500).json({ error: "Failed to fetch distance" });
   }
 }
-
-module.exports = handler;
 
 

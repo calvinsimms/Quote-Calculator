@@ -1,32 +1,42 @@
-async function handler(req, res) {
-  const { input } = req.query;
+export default async function handler(req, res) {
+  if (req.method !== "GET") return res.status(405).end();
 
-  if (!input) return res.status(400).json({ error: "Missing input" });
+  const { input } = req.query;
+  if (!input || input.length < 3) {
+    return res.json({ predictions: [] });
+  }
+
+  if (!global.autocompleteCache) global.autocompleteCache = {};
+  if (global.autocompleteCache[input]) {
+    return res.json(global.autocompleteCache[input]);
+  }
 
   try {
-    const apiKey = process.env.GOOGLE_API_KEY;
-
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/autocomplete/json?` +
-      `input=${encodeURIComponent(input)}` +
-      `&types=address` +
-      `&components=country:ca` + 
-      `&key=${apiKey}`
-    );
+    const response = await fetch("https://places.googleapis.com/v1/places:autocomplete", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": process.env.GOOGLE_API_KEY,
+        "X-Goog-FieldMask":
+          "suggestions.placePrediction.place.formattedAddress,suggestions.placePrediction.place.id"
+      },
+      body: JSON.stringify({ input })
+    });
 
     const data = await response.json();
 
-    const predictions = data.predictions.map(p => ({
-      description: p.description,
-      place_id: p.place_id
-    }));
+    const formatted = {
+      predictions: (data.suggestions || []).map(s => ({
+        description: s.placePrediction?.place?.formattedAddress || "",
+        place_id: s.placePrediction?.place?.id || ""
+      }))
+    };
 
-    res.status(200).json({ predictions });
+    global.autocompleteCache[input] = formatted;
+    res.json(formatted);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Autocomplete failed" });
+    console.error("Autocomplete error:", err);
+    res.status(500).json({ error: "Failed to fetch autocomplete" });
   }
 }
-
-module.exports = handler;
 
