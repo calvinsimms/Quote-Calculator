@@ -636,9 +636,8 @@ function calculateQuote(includeTravel = false) {
   if (numMen === 4) crewFactor = 0.6;
 
   const trailerEquivalents = totalCuFt / avgTrailerSize;
-  const loadTimeOneTrip = baseTimePerFullTrailer * trailerEquivalents * crewFactor;
-  const unloadTimeOneTrip = loadTimeOneTrip;
-  const totalLoadUnloadTime = (loadTimeOneTrip + unloadTimeOneTrip) * trips;
+  // Total load+unload time is always proportional to total cubic feet, not multiplied by trips
+  const totalLoadUnloadTime = baseTimePerFullTrailer * trailerEquivalents * crewFactor * 2;
 
   if (includeTravel) {
     if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes * ((2 * trips) - 1);
