@@ -463,10 +463,17 @@ async function getAutocompleteSuggestions(query) {
     return autocompleteCache[query];
   }
 
-  const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
-  const data = await res.json();
-  autocompleteCache[query] = data.predictions || [];
-  return autocompleteCache[query];
+  try {
+    const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
+    if (!res.ok) return [];
+
+    const data = await res.json();
+    autocompleteCache[query] = data.predictions || [];
+    return autocompleteCache[query];
+  } catch (err) {
+    console.error("Autocomplete fetch error:", err);
+    return [];
+  }
 }
 
 function setupAutocomplete(inputEl, dropdownEl) {
