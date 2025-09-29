@@ -95,35 +95,6 @@ input::placeholder {
 .button-bubble:active {
     background: linear-gradient(145deg, #3a8dff, #6cc1ff); 
 }
-.load-dropdown, .unload-dropdown {
-    position: absolute;       
-    top: calc(100% + 5px);    
-    left: 0;
-    width: 100%;              
-    max-height: 250px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 25px;
-    font-size: 16px;
-    overflow-y: auto;
-    display: none;
-    z-index: 1000;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(10px); 
-    -webkit-backdrop-filter: blur(10px);
-}
-.load-dropdown .dropdown-item,
-.unload-dropdown .dropdown-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(91, 91, 91, 0.05);
-}
-.load-dropdown .dropdown-item:last-child,
-.unload-dropdown .dropdown-item:last-child {
-    border-bottom: none;
-}
 .calculate-button {
   display: flex;
   align-items: center; 
@@ -309,9 +280,9 @@ input::placeholder {
 
 <div id="unload-input" class="input-container">
   <input type="text" id="load-address" placeholder="load address..." autocomplete="off">
-   <div id="load-dropdown" class="load-dropdown"></div>
+   <div id="load-dropdown" class="dropdown"></div>
   <input type="text" id="unload-address" placeholder="unload address..." autocomplete="off">
-   <div id="unload-dropdown" class="unload-dropdown"></div>
+   <div id="unload-dropdown" class="dropdown"></div>
   <button id="calculate-route" class="calculate-button button-bubble">Calculate</button>
 </div>
 
@@ -458,6 +429,17 @@ function updateItemsList(){
   });
 }
 
+// ------------------------ Autocomplete ------------------------
+const loadInput = document.getElementById("load-address");
+const unloadInput = document.getElementById("unload-address");
+
+async function getAutocompleteSuggestions(query) {
+  if (!query) return [];
+  const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
+  const data = await res.json();
+  return data.predictions || [];
+}
+
 function setupAutocomplete(inputEl, dropdownEl) {
   inputEl.addEventListener("input", async () => {
     const val = inputEl.value.trim();
@@ -480,39 +462,19 @@ function setupAutocomplete(inputEl, dropdownEl) {
       dropdownEl.appendChild(div);
     });
 
-    if (suggestions.length) {
-      // Position dropdown relative to input
-      const rect = inputEl.getBoundingClientRect();
-      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-      dropdownEl.style.top = rect.bottom + scrollTop + "px";
-      dropdownEl.style.left = rect.left + scrollLeft + "px";
-      dropdownEl.style.width = rect.width + "px";
-      dropdownEl.style.display = "block";
-      dropdownEl.style.position = "absolute";
-      dropdownEl.style.zIndex = 9999;
-    } else {
-      dropdownEl.style.display = "none";
-    }
+    dropdownEl.style.display = suggestions.length ? "block" : "none";
   });
 
-  // Hide dropdown if clicking outside
   document.addEventListener("click", (e) => {
     if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
       dropdownEl.style.display = "none";
     }
   });
-
-  // Optional: hide dropdown on scroll
-  window.addEventListener("scroll", () => {
-    dropdownEl.style.display = "none";
-  });
 }
 
-// Initialize separate dropdowns for load and unload
+// Initialize
 setupAutocomplete(loadInput, document.getElementById("load-dropdown"));
 setupAutocomplete(unloadInput, document.getElementById("unload-dropdown"));
-
 
 
 
