@@ -23,6 +23,10 @@ export default async function handler(req, res) {
       }),
     });
     const data = await apiRes.json();
+    console.log('Google Places API (New) raw response:', JSON.stringify(data));
+    if (data.error) {
+      console.error('Google Places API (New) error:', data.error);
+    }
     // The new API returns 'suggestions' array
     // Map to the old format for frontend compatibility
     const predictions = (data.suggestions || []).map(s => ({
@@ -32,7 +36,7 @@ export default async function handler(req, res) {
     }));
     res.status(200).json({ predictions });
   } catch (err) {
-    console.error('Places API (New) error:', err);
+    console.error('Places API (New) exception:', err);
     res.status(500).json({ predictions: [] });
   }
 }
