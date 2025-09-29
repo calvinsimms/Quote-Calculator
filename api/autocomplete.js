@@ -1,22 +1,40 @@
+import { NextRequest, NextResponse } from 'next/server';
+
 export default async function handler(req, res) {
   const { input } = req.query;
   if (!input) return res.status(400).json({ predictions: [] });
 
   const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
 
-  const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${GOOGLE_API_KEY}&types=address`;
+  // New Places API (New) endpoint
+  const url = 'https://places.googleapis.com/v1/places:autocomplete';
 
   try {
-    const response = await fetch(url);
-    const data = await response.json();
-
-    // Only send predictions to the frontend
-    res.status(200).json({ predictions: data.predictions || [] });
+    const apiRes = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': GOOGLE_API_KEY,
+      },
+      body: JSON.stringify({
+        input,
+        languageCode: 'en',
+        types: ['address'],
+        // You can add locationBias or sessionToken if needed
+      }),
+    });
+    const data = await apiRes.json();
+    // The new API returns 'suggestions' array
+    // Map to the old format for frontend compatibility
+    const predictions = (data.suggestions || []).map(s => ({
+      description: s.formattedSuggestion,
+      place_id: s.placePrediction.placeId,
+      // Add more fields if needed
+    }));
+    res.status(200).json({ predictions });
   } catch (err) {
-    console.error("Google Places API error:", err);
+    console.error('Places API (New) error:', err);
     res.status(500).json({ predictions: [] });
   }
 }
-
-
 
