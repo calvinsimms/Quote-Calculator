@@ -1,4 +1,7 @@
-tf-8" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Quote Calculator</title>
 <style>
@@ -235,6 +238,7 @@ input::placeholder {
   background: linear-gradient(145deg, #6cc1ff, #3a8dff);
   box-shadow: 0 1px 5px rgba(0,0,0,0.2);
 }
+
 </style>
 </head>
 <body>
@@ -286,16 +290,13 @@ let itemsData = {};
 let itemsList = [];
 let selectedItems = [];
 let numMen = 2;
-let selectedTrailer = "Small Trailer";
 let travelData = { minutes: 0, distanceMeters: 0 }; 
 
 const searchInput = document.getElementById("item-select");
 const dropdown = document.getElementById("dropdown");
 const quantityInput = document.getElementById("item-quantity");
-const loadInput = document.getElementById("load-address");
-const unloadInput = document.getElementById("unload-address");
 
-// ------------------------ Load Items from Google Sheets ------------------------
+// ------------------------ Load Google Sheets data ------------------------
 async function loadItemsData() {
   const url = "https://docs.google.com/spreadsheets/d/1cW3RxxxLof_CcXueLCtNfYNqXnrCeAzfHnALnE82ihk/gviz/tq?tqx=out:json&sheet=Sheet1";
   const response = await fetch(url);
@@ -311,15 +312,20 @@ async function loadItemsData() {
   });
 
   itemsList = Object.values(itemsData).map(i => i.name);
+
   updateItemsList();
   calculateQuote();
 }
 
-// ------------------------ Dropdown ------------------------
+// ------------------------ Dropdown logic ------------------------
 function updateDropdown(filterValue) {
   const val = filterValue.toLowerCase().trim();
   dropdown.innerHTML = "";
-  let matches = itemsList.filter(item => item.toLowerCase().includes(val)).sort((a,b)=>a.localeCompare(b));
+
+  let matches = itemsList.filter(item => item.toLowerCase().includes(val));
+
+  matches.sort((a, b) => a.localeCompare(b));
+
   matches.forEach(item => {
     const div = document.createElement("div");
     div.classList.add("dropdown-item");
@@ -327,31 +333,46 @@ function updateDropdown(filterValue) {
     div.addEventListener("click", () => { 
       searchInput.value = item; 
       dropdown.style.display = "none"; 
-      calculateQuote(true);
     });
     dropdown.appendChild(div);
   });
+
   dropdown.style.display = matches.length ? "block" : "none";
 }
 
-searchInput.addEventListener("focus", () => { searchInput.value = ""; if(itemsList.length>0) updateDropdown(""); });
-searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
-document.addEventListener("click", e => { if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) dropdown.style.display="none"; });
+searchInput.addEventListener("focus", () => {
+    searchInput.value = "";  
+    if (itemsList.length > 0) updateDropdown("");     
+});
 
-// ------------------------ Add Items ------------------------
+searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
+
+document.addEventListener("click", e => { 
+  if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.style.display = "none";
+  }
+});
+
+// ------------------------ Add Item ------------------------
 document.getElementById("add-item").addEventListener("click", () => {
   const inputName = searchInput.value.trim().toLowerCase();
   const quantity = parseInt(quantityInput.value) || 0;
+
   if(quantity > 0 && itemsData[inputName]){
     let existing = selectedItems.find(i => i.name.toLowerCase() === inputName);
-    if(existing){ existing.quantity += quantity; } 
-    else { selectedItems.push({ name: itemsData[inputName].name, quantity }); }
+    if(existing){ 
+        existing.quantity += quantity; 
+    } else { 
+        selectedItems.push({ name: itemsData[inputName].name, quantity });
+    }
+
     updateItemsList();
-    calculateQuote(true);  // always include travel
+    calculateQuote();
     quantityInput.value = 1;
   }
 });
 
+// ------------------------ Update Items List ------------------------
 function updateItemsList(){
   const listDiv = document.getElementById("items-list");
   listDiv.innerHTML="";
@@ -365,7 +386,7 @@ function updateItemsList(){
     removeBtn.addEventListener("click",()=>{ 
       selectedItems.splice(index,1); 
       updateItemsList(); 
-      calculateQuote(true); 
+      calculateQuote(); 
     });
 
     const nameSpan = document.createElement("span");
@@ -382,8 +403,11 @@ function updateItemsList(){
 }
 
 // ------------------------ Autocomplete ------------------------
+const loadInput = document.getElementById("load-address");
+const unloadInput = document.getElementById("unload-address");
+
 async function getAutocompleteSuggestions(query) {
-  if(!query) return [];
+  if (!query) return [];
   const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
   const data = await res.json();
   return data.predictions || [];
@@ -392,103 +416,146 @@ async function getAutocompleteSuggestions(query) {
 function setupAutocomplete(inputEl, dropdownEl) {
   inputEl.addEventListener("input", async () => {
     const val = inputEl.value.trim();
-    if(!val){ dropdownEl.style.display="none"; calculateQuote(true); return; }
+    if (!val) {
+      dropdownEl.style.display = "none";
+      return;
+    }
+
     const suggestions = await getAutocompleteSuggestions(val);
-    dropdownEl.innerHTML="";
-    suggestions.forEach(s=>{
+    dropdownEl.innerHTML = "";
+
+    suggestions.forEach(s => {
       const div = document.createElement("div");
       div.classList.add("dropdown-item");
       div.textContent = s.description;
       div.addEventListener("click", () => {
         inputEl.value = s.description;
-        dropdownEl.style.display="none";
-        awaitTravelDataAndCalculate();
+        dropdownEl.style.display = "none";
       });
       dropdownEl.appendChild(div);
     });
+
     dropdownEl.style.display = suggestions.length ? "block" : "none";
   });
 
-  document.addEventListener("click", e => { 
-    if(!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) dropdownEl.style.display="none";
+  document.addEventListener("click", (e) => {
+    if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
+      dropdownEl.style.display = "none";
+    }
   });
 }
 
 setupAutocomplete(loadInput, document.getElementById("load-dropdown"));
 setupAutocomplete(unloadInput, document.getElementById("unload-dropdown"));
 
-// ------------------------ Crew & Trailer ------------------------
-document.querySelectorAll(".crew-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".crew-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    numMen = parseInt(btn.dataset.men);
-    calculateQuote(true);
-  });
-});
+// ------------------------ Debounce Helper ------------------------
+function debounce(func, delay) {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func(...args), delay);
+  };
+}
 
-document.querySelectorAll(".trailer-btn").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".trailer-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    selectedTrailer = btn.dataset.trailer;
-    calculateQuote(true);
-  });
-});
-
-// ------------------------ Travel & Distance ------------------------
-async function awaitTravelDataAndCalculate() {
+// ------------------------ Calculate Travel ------------------------
+async function calculateTravelIfReady() {
   const origin = loadInput.value.trim();
   const destination = unloadInput.value.trim();
-  if(!origin || !destination){ calculateQuote(true); return; }
+
+  if (!origin || !destination) return;
+
   try {
     const res = await fetch(`/api/distance?origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}`);
     const data = await res.json();
-    if(data.rows && data.rows[0].elements[0].status==="OK"){
+
+    if (data.rows && data.rows[0].elements[0].status === "OK") {
       const element = data.rows[0].elements[0];
-      travelData.minutes = element.duration.value / 60;  // seconds -> minutes
+      travelData.minutes = element.duration.value / 60; 
       travelData.distanceMeters = element.distance.value;
+
+      calculateQuote(true);
     }
-  } catch(err){ console.error(err); }
-  calculateQuote(true);
+  } catch (err) {
+    console.error("Error calculating travel time:", err);
+  }
+}
+
+const debouncedCalculateTravel = debounce(calculateTravelIfReady, 500);
+
+[loadInput, unloadInput].forEach(input => {
+  input.addEventListener("input", () => {
+    debouncedCalculateTravel();
+  });
+});
+
+// ------------------------ Crew Buttons ------------------------
+document.querySelectorAll(".crew-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".crew-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    numMen = parseInt(btn.dataset.men);
+    calculateQuote();
+  });
+});
+
+let selectedTrailer = "Small Trailer"; 
+
+document.querySelectorAll(".trailer-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".trailer-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    selectedTrailer = btn.dataset.trailer;
+    calculateQuote(); 
+  });
+});
+
+// ------------------------ Helpers ------------------------
+function formatTime(minutes){ 
+  const h=Math.floor(minutes/60); 
+  const m=minutes%60; 
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`; 
 }
 
 // ------------------------ Calculate Quote ------------------------
-function calculateQuote(includeTravel=true){
+function calculateQuote(includeTravel = false) {
   let totalCuFt = 0, quote = 0;
-  let travelMinutes = 0, totalDistanceMeters = 0;
+  let travelMinutes = 0;
+  let totalDistanceMeters = 0;
 
-  // Total cubic feet
-  selectedItems.forEach(i=> totalCuFt += (itemsData[i.name.toLowerCase()]?.cubicFeet||0) * i.quantity);
+  selectedItems.forEach(i => totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity);
 
-  // Trailer logic
   const trailerSizes = { "Small Trailer": 670, "Large Trailer": 750, "Both Trailers": 1420 };
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
-  const trips = totalCuFt>0 ? Math.ceil(totalCuFt/trailerCapacity) : 0;
-  const trailerUsagePercent = trips>0 ? (totalCuFt/trailerCapacity)*100 : 0;
+  const trips = Math.ceil(totalCuFt / trailerCapacity);
 
-  // Work time
+  const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100;
+
   const avgTrailerSize = 710;
-  const baseTimePerFullTrailer = 150; // minutes
-  const crewFactor = numMen===3?0.8: numMen===4?0.6:1.0;
-  const trailerEquivalents = totalCuFt/avgTrailerSize;
-  const loadTimeOneTrip = baseTimePerFullTrailer*trailerEquivalents*crewFactor;
-  const unloadTimeOneTrip = loadTimeOneTrip;
-  const totalLoadUnloadTime = (loadTimeOneTrip+unloadTimeOneTrip)*trips;
+  const baseTimePerFullTrailer = 150;
+  let crewFactor = 1.0;
+  if (numMen === 3) crewFactor = 0.8;
+  if (numMen === 4) crewFactor = 0.6;
 
-  // Travel time & distance
-  if(includeTravel && travelData.minutes && trips>0){
-    travelMinutes = travelData.minutes * ((2*trips)-1);
-    totalDistanceMeters = travelData.distanceMeters * ((2*trips)-1);
+  const trailerEquivalents = totalCuFt / avgTrailerSize;
+  const loadTimeOneTrip = baseTimePerFullTrailer * trailerEquivalents * crewFactor;
+  const unloadTimeOneTrip = loadTimeOneTrip;
+  const totalLoadUnloadTime = (loadTimeOneTrip + unloadTimeOneTrip) * trips;
+
+  if (includeTravel) {
+    if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
+    if (!isNaN(travelData.distanceMeters)) totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
   }
 
   const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
-  const totalHours = totalMinutesIncludingTravel/60;
-  const crewHourlyRate = numMen===3?160:numMen===4?200:120;
-  quote = totalHours * crewHourlyRate;
-  const totalDistanceKm = totalDistanceMeters/1000;
+  const totalHours = totalMinutesIncludingTravel / 60;
 
-  // Display
+  let crewHourlyRate = 120;
+  if (numMen === 3) crewHourlyRate = 160;
+  if (numMen === 4) crewHourlyRate = 200;
+
+  quote = totalHours * crewHourlyRate;
+  const totalDistanceKm = totalDistanceMeters / 1000;
+
   const totalsDiv = document.getElementById("totals");
   totalsDiv.innerHTML = `
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
@@ -503,19 +570,9 @@ function calculateQuote(includeTravel=true){
   `;
 }
 
-// ------------------------ Helpers ------------------------
-function formatTime(minutes){
-  const h=Math.floor(minutes/60), m=minutes%60;
-  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
-}
-
-// ------------------------ Triggers ------------------------
-[loadInput, unloadInput].forEach(input=>input.addEventListener("input", awaitTravelDataAndCalculate));
-
-// ------------------------ Initial ------------------------
+// ------------------------ Initial Display ------------------------
 loadItemsData();
-updateItemsList();
-calculateQuote(true);
+calculateQuote();
 </script>
 
 </body>
