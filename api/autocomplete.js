@@ -7,7 +7,11 @@ async function handler(req, res) {
     const apiKey = process.env.GOOGLE_API_KEY;
 
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=address&key=${apiKey}`
+      `https://maps.googleapis.com/maps/api/place/autocomplete/json?` +
+      `input=${encodeURIComponent(input)}` +
+      `&types=address` +
+      `&components=country:ca` + 
+      `&key=${apiKey}`
     );
 
     const data = await response.json();
@@ -25,3 +29,4 @@ async function handler(req, res) {
 }
 
 module.exports = handler;
+
