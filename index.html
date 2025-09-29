@@ -564,11 +564,14 @@ function calculateQuote(includeTravel = false) {
   let travelMinutes = 0;
   let totalDistanceMeters = 0;
 
+  // Sum cubic feet
   selectedItems.forEach(i => totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity);
 
   const trailerSizes = { "Small Trailer": 670, "Large Trailer": 750, "Both Trailers": 1420 };
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
-  const trips = Math.ceil(totalCuFt / trailerCapacity);
+
+  // Minimum trips should be 1
+  const trips = Math.max(1, Math.ceil(totalCuFt / trailerCapacity));
 
   const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100;
 
@@ -583,9 +586,14 @@ function calculateQuote(includeTravel = false) {
   const unloadTimeOneTrip = loadTimeOneTrip;
   const totalLoadUnloadTime = (loadTimeOneTrip + unloadTimeOneTrip) * trips;
 
+  // Only update travel time if explicitly requested
   if (includeTravel) {
     if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
     if (!isNaN(travelData.distanceMeters)) totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
+  } else {
+    // Use previously stored travel time if it exists
+    travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
+    totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
   }
 
   const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
