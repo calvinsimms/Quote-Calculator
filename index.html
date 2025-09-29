@@ -466,7 +466,7 @@ function calculateQuote(includeTravel=false) {
     totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity;
   });
 
-  const trailerSizes = { S: 670, L: 750 };
+  const trailerSizes = { "Small Trailer": 670, "Large Trailer": 750, "Both Trailers": 1420 };
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
 
   const trips = Math.ceil(totalCuFt / trailerCapacity);
