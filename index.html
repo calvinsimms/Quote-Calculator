@@ -459,22 +459,22 @@ function debounce(fn, delay) {
 async function getAutocompleteSuggestions(query) {
   if (!query) return [];
 
-  if (autocompleteCache[query]) {
-    return autocompleteCache[query];
-  }
+  if (autocompleteCache[query]) return autocompleteCache[query];
 
   try {
     const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
     if (!res.ok) return [];
 
     const data = await res.json();
-    autocompleteCache[query] = data.predictions || [];
-    return autocompleteCache[query];
+    const predictions = Array.isArray(data.predictions) ? data.predictions : [];
+    autocompleteCache[query] = predictions;
+    return predictions;
   } catch (err) {
     console.error("Autocomplete fetch error:", err);
     return [];
   }
 }
+
 
 function setupAutocomplete(inputEl, dropdownEl) {
   const debouncedFetch = debounce(async (val) => {
@@ -501,20 +501,24 @@ function setupAutocomplete(inputEl, dropdownEl) {
   }, 300);
 
   inputEl.addEventListener("input", () => {
-    const val = inputEl.value.trim();
-    if (!val) {
-      dropdownEl.style.display = "none";
-      return;
-    }
-    debouncedFetch(val);
+    debouncedFetch(inputEl.value.trim());
   });
 
+  // Show dropdown on focus if value is already >=3 chars
+  inputEl.addEventListener("focus", () => {
+    if (inputEl.value.trim().length >= 3) {
+      debouncedFetch(inputEl.value.trim());
+    }
+  });
+
+  // Hide dropdown when clicking outside
   document.addEventListener("click", (e) => {
     if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
       dropdownEl.style.display = "none";
     }
   });
 }
+
 
 // Initialize
 setupAutocomplete(loadInput, document.getElementById("load-dropdown"));
