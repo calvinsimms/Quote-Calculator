@@ -41,13 +41,16 @@ body {
 input, select, button { 
     text-align: center; 
     width: 100%; 
-    padding: 6px; 
+    padding: 6px 12px; 
     border-radius: 20px; 
     font-size: 16px; 
     border: 1px solid white; 
     background-color: #f5f5f5;
     box-sizing: border-box;    
-    font-family: inherit;      
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+   
 }
 input:focus, select:focus { 
     border-color: #007BFF; 
@@ -61,6 +64,7 @@ input::placeholder {
 }
 .small-input {
     width: 45px;
+    padding: 4px;
 }
 .small-button {
     width: 40px;
