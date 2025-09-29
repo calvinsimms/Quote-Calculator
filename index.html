@@ -64,7 +64,7 @@ input::placeholder {
 }
 .small-input {
     width: 45px;
-    padding: 4px;
+    padding: 6px;
 }
 .small-button {
     width: 40px;
@@ -237,7 +237,7 @@ input::placeholder {
 .crew-container span,
 .trailer-container span {
   flex-shrink: 0;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .button-group {
@@ -252,8 +252,8 @@ input::placeholder {
   border-radius: 20px;
   width: 40px;
   border: none;
-  background: linear-gradient(145deg, #c8c8c8, #9b9b9b);
-  color: white;
+  background-color: #f5f5f5;
+  color: #b8b8b8;      
   cursor: pointer;
   font-weight: bold;
 }
@@ -262,6 +262,7 @@ input::placeholder {
 .trailer-btn.active {
   background: linear-gradient(145deg, #6cc1ff, #3a8dff);
   box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+  color: white;
 }
 
 </style>
@@ -307,6 +308,7 @@ input::placeholder {
       <button class="crew-btn" data-men="4">4</button>
     </div>
   </div>
+
   <div class="trailer-container">
     <span>Trailer Size</span>
     <div class="button-group">
@@ -326,7 +328,7 @@ let itemsData = {};
 let itemsList = [];
 let selectedItems = [];
 let numMen = 2;
-let travelData = { minutes: 0, distanceMeters: 0 }; // <-- persistent travel times
+let travelData = { minutes: 0, distanceMeters: 0 }; 
 
 const searchInput = document.getElementById("item-select");
 const dropdown = document.getElementById("dropdown");
@@ -376,16 +378,13 @@ function updateDropdown(filterValue) {
   dropdown.style.display = matches.length ? "block" : "none";
 }
 
-// Show dropdown on focus and clear input
 searchInput.addEventListener("focus", () => {
     searchInput.value = "";  
     if (itemsList.length > 0) updateDropdown("");     
 });
 
-// Update dropdown on typing
 searchInput.addEventListener("input", () => updateDropdown(searchInput.value));
 
-// Hide dropdown if clicking outside
 document.addEventListener("click", e => { 
   if(!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
     dropdown.style.display = "none";
@@ -408,7 +407,7 @@ document.getElementById("add-item").addEventListener("click", () => {
     updateItemsList();
     calculateQuote();
     quantityInput.value = 1;
-    markButtonDirty(); // <-- mark calculate button as dirty
+    markButtonDirty(); 
   }
 });
 
@@ -427,7 +426,7 @@ function updateItemsList(){
       selectedItems.splice(index,1); 
       updateItemsList(); 
       calculateQuote(); 
-      markButtonDirty(); // <-- mark calculate button as dirty
+      markButtonDirty(); 
     });
 
     const nameSpan = document.createElement("span");
@@ -447,18 +446,32 @@ function updateItemsList(){
 const loadInput = document.getElementById("load-address");
 const unloadInput = document.getElementById("unload-address");
 
+const autocompleteCache = {};
+
+function debounce(fn, delay) {
+  let timeoutId;
+  return function (...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
 async function getAutocompleteSuggestions(query) {
   if (!query) return [];
+
+  if (autocompleteCache[query]) {
+    return autocompleteCache[query];
+  }
+
   const res = await fetch(`/api/autocomplete?input=${encodeURIComponent(query)}`);
   const data = await res.json();
-  console.log("Autocomplete API response:", data);
-  return data.predictions || [];
+  autocompleteCache[query] = data.predictions || [];
+  return autocompleteCache[query];
 }
 
 function setupAutocomplete(inputEl, dropdownEl) {
-  inputEl.addEventListener("input", async () => {
-    const val = inputEl.value.trim();
-    if (!val) {
+  const debouncedFetch = debounce(async (val) => {
+    if (val.length < 3) {
       dropdownEl.style.display = "none";
       return;
     }
@@ -478,6 +491,15 @@ function setupAutocomplete(inputEl, dropdownEl) {
     });
 
     dropdownEl.style.display = suggestions.length ? "block" : "none";
+  }, 300);
+
+  inputEl.addEventListener("input", () => {
+    const val = inputEl.value.trim();
+    if (!val) {
+      dropdownEl.style.display = "none";
+      return;
+    }
+    debouncedFetch(val);
   });
 
   document.addEventListener("click", (e) => {
@@ -511,7 +533,7 @@ document.getElementById("calculate-route").addEventListener("click", async () =>
 
     if (data.rows && data.rows[0].elements[0].status === "OK") {
       const element = data.rows[0].elements[0];
-      travelData.minutes = element.duration.value; // store in seconds
+      travelData.minutes = element.duration.value; 
       travelData.distanceMeters = element.distance.value;
 
       calculateQuote(true);
@@ -553,7 +575,7 @@ document.querySelectorAll(".crew-btn").forEach(btn => {
     btn.classList.add("active");
     numMen = parseInt(btn.dataset.men);
     calculateQuote();
-    markButtonDirty(); // <-- mark calculate button as dirty
+    markButtonDirty(); 
   });
 });
 
@@ -566,7 +588,7 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
     btn.classList.add("active");
     selectedTrailer = btn.dataset.trailer;
     calculateQuote(); 
-    markButtonDirty(); // <-- mark calculate button as dirty
+    markButtonDirty(); 
   });
 });
 
@@ -576,13 +598,11 @@ function calculateQuote(includeTravel = false) {
   let travelMinutes = 0;
   let totalDistanceMeters = 0;
 
-  // Sum cubic feet
   selectedItems.forEach(i => totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity);
 
   const trailerSizes = { "Small Trailer": 670, "Large Trailer": 750, "Both Trailers": 1420 };
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
 
-  // Minimum trips should be 1
   const trips = Math.max(1, Math.ceil(totalCuFt / trailerCapacity));
 
   const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100;
@@ -598,12 +618,11 @@ function calculateQuote(includeTravel = false) {
   const unloadTimeOneTrip = loadTimeOneTrip;
   const totalLoadUnloadTime = (loadTimeOneTrip + unloadTimeOneTrip) * trips;
 
-  // Only update travel time if explicitly requested
   if (includeTravel) {
     if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
     if (!isNaN(travelData.distanceMeters)) totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
   } else {
-    // Use previously stored travel time if it exists
+
     travelMinutes = travelData.minutes / 60 * ((2 * trips) - 1);
     totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
   }
@@ -632,7 +651,6 @@ function calculateQuote(includeTravel = false) {
   `;
 }
 
-// ------------------------ Mark button dirty ------------------------
 function markButtonDirty() {
   calculateBtn.classList.remove("calculated");
 }
@@ -642,6 +660,7 @@ loadItemsData();
 updateItemsList();
 calculateQuote();
 </script>
+
 
 </body>
 </html>
