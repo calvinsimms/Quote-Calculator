@@ -184,7 +184,35 @@ input::placeholder {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px); 
   -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
 }
+
+.dropdown-done-btn {
+  position: sticky;
+  bottom: 0;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #6cc1ff, #3a8dff);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 5px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  display: block;
+  width: 90%;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+}
+.dropdown-done-btn:active {
+  background: linear-gradient(145deg, #3a8dff, #6cc1ff);
+}
+
 .dropdown-item {
   display: flex;
   align-items: center;
@@ -366,6 +394,9 @@ function updateDropdown(filterValue) {
 
   matches.sort((a, b) => a.localeCompare(b));
 
+  // Remove all children first
+  dropdown.innerHTML = "";
+  // Add items
   matches.forEach(item => {
     const div = document.createElement("div");
     div.classList.add("dropdown-item");
@@ -376,18 +407,14 @@ function updateDropdown(filterValue) {
     });
     dropdown.appendChild(div);
   });
-
-  // Always add Done button at the bottom
+  // Always add Done button at the bottom (sticky)
   const doneBtn = document.createElement("button");
   doneBtn.textContent = "Done";
   doneBtn.className = "dropdown-done-btn button-bubble calculate-button";
-  doneBtn.style.margin = "8px auto 0 auto";
-  doneBtn.style.width = "90%";
   doneBtn.addEventListener("click", () => {
     dropdown.style.display = "none";
   });
   dropdown.appendChild(doneBtn);
-
   dropdown.style.display = "block";
 }
 
@@ -417,12 +444,12 @@ document.getElementById("add-item").addEventListener("click", () => {
         selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
 
-    updateItemsList();
-    calculateQuote();
-    quantityInput.value = 1;
-    // Keep dropdown open after adding
-    updateDropdown("");
-    // markButtonDirty(); // Only addresses should reset button
+  updateItemsList();
+  calculateQuote();
+  quantityInput.value = 1;
+  // Keep dropdown open after adding
+  setTimeout(() => updateDropdown(searchInput.value), 0);
+  // markButtonDirty(); // Only addresses should reset button
   }
 });
 
