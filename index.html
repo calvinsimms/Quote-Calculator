@@ -409,7 +409,6 @@ document.getElementById("add-item").addEventListener("click", () => {
   updateItemsList();
   calculateQuote();
   quantityInput.value = 1;
-  // markButtonDirty(); // Only addresses should reset button
   }
 });
 
@@ -428,7 +427,6 @@ function updateItemsList(){
       selectedItems.splice(index,1); 
       updateItemsList(); 
       calculateQuote(); 
-      // markButtonDirty(); // Only addresses should reset button
     });
 
     const nameSpan = document.createElement("span");
@@ -477,7 +475,6 @@ async function getAutocompleteSuggestions(query) {
   }
 }
 
-
 function setupAutocomplete(inputEl, dropdownEl) {
   const debouncedFetch = debounce(async (val) => {
     if (val.length < 3) {
@@ -524,7 +521,6 @@ function setupAutocomplete(inputEl, dropdownEl) {
     debouncedFetch(inputEl.value.trim());
   });
 
-  // Hide dropdown when clicking outside
   document.addEventListener("click", (e) => {
     if (!inputEl.contains(e.target) && !dropdownEl.contains(e.target)) {
       dropdownEl.style.display = "none";
@@ -532,8 +528,6 @@ function setupAutocomplete(inputEl, dropdownEl) {
   });
 }
 
-
-// Initialize
 setupAutocomplete(loadInput, document.getElementById("load-dropdown"));
 setupAutocomplete(unloadInput, document.getElementById("unload-dropdown"));
 
@@ -571,7 +565,6 @@ document.getElementById("calculate-route").addEventListener("click", async () =>
   }
 });
 
-// --- Reset button state when addresses change ---
 [loadAddress, unloadAddress].forEach(input => {
   input.addEventListener("input", () => {
     markButtonDirty();
@@ -599,7 +592,7 @@ document.querySelectorAll(".crew-btn").forEach(btn => {
     btn.classList.add("active");
     numMen = parseInt(btn.dataset.men);
   calculateQuote();
-  // markButtonDirty(); // Only addresses should reset button
+
   });
 });
 
@@ -612,7 +605,6 @@ document.querySelectorAll(".trailer-btn").forEach(btn => {
     btn.classList.add("active");
     selectedTrailer = btn.dataset.trailer;
   calculateQuote(); 
-  // markButtonDirty(); // Only addresses should reset button
   });
 });
 
@@ -638,7 +630,7 @@ function calculateQuote(includeTravel = false) {
   if (numMen === 4) crewFactor = 0.6;
 
   const trailerEquivalents = totalCuFt / avgTrailerSize;
-  // Total load+unload time is always proportional to total cubic feet, not multiplied by trips
+
   const totalLoadUnloadTime = baseTimePerFullTrailer * trailerEquivalents * crewFactor * 2;
 
   if (includeTravel) {
