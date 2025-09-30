@@ -190,12 +190,12 @@ input::placeholder {
 
 .dropdown-done-btn {
   position: sticky;
-  bottom: 0;
+  bottom: calc(100% - 10px);
   margin-top: 8px;
   margin-bottom: 4px;
   font-size: 16px;
   font-weight: bold;
-  border-radius: 20px;
+  border-radius: 0 20px 20px 0;
   background: linear-gradient(145deg, #6cc1ff, #3a8dff);
   color: white;
   border: none;
@@ -203,7 +203,7 @@ input::placeholder {
   box-shadow: 0 1px 5px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
   display: block;
-  width: 90%;
+  width: calc(100% - 10px);
   left: 0;
   right: 0;
   margin-left: auto;
@@ -418,10 +418,9 @@ function updateDropdown(filterValue) {
   dropdown.style.display = "block";
 }
   quantityInput.addEventListener("input", () => {
-    // Keep dropdown open and show full list when quantity changes
+    // Keep dropdown open and preserve current filter when quantity changes
     if (dropdown.style.display === "block") {
-      searchInput.value = "";
-      updateDropdown("");
+      updateDropdown(searchInput.value);
     }
   });
 
