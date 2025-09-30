@@ -372,11 +372,23 @@ function updateDropdown(filterValue) {
     div.textContent = item;
     div.addEventListener("click", () => { 
       searchInput.value = item; 
-      dropdown.style.display = "none"; 
+      // Do not close dropdown here
     });
     dropdown.appendChild(div);
   });
 
+  // Add Done button at the bottom
+  if (matches.length) {
+    const doneBtn = document.createElement("button");
+    doneBtn.textContent = "Done";
+    doneBtn.className = "dropdown-done-btn button-bubble calculate-button";
+    doneBtn.style.margin = "8px auto 0 auto";
+    doneBtn.style.width = "90%";
+    doneBtn.addEventListener("click", () => {
+      dropdown.style.display = "none";
+    });
+    dropdown.appendChild(doneBtn);
+  }
   dropdown.style.display = matches.length ? "block" : "none";
 }
 
