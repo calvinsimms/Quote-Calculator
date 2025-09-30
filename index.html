@@ -417,6 +417,13 @@ function updateDropdown(filterValue) {
   dropdown.appendChild(doneBtn);
   dropdown.style.display = "block";
 }
+  quantityInput.addEventListener("input", () => {
+    // Keep dropdown open and show full list when quantity changes
+    if (dropdown.style.display === "block") {
+      searchInput.value = "";
+      updateDropdown("");
+    }
+  });
 
 searchInput.addEventListener("focus", () => {
     searchInput.value = "";  
