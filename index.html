@@ -377,19 +377,18 @@ function updateDropdown(filterValue) {
     dropdown.appendChild(div);
   });
 
-  // Add Done button at the bottom
-  if (matches.length) {
-    const doneBtn = document.createElement("button");
-    doneBtn.textContent = "Done";
-    doneBtn.className = "dropdown-done-btn button-bubble calculate-button";
-    doneBtn.style.margin = "8px auto 0 auto";
-    doneBtn.style.width = "90%";
-    doneBtn.addEventListener("click", () => {
-      dropdown.style.display = "none";
-    });
-    dropdown.appendChild(doneBtn);
-  }
-  dropdown.style.display = matches.length ? "block" : "none";
+  // Always add Done button at the bottom
+  const doneBtn = document.createElement("button");
+  doneBtn.textContent = "Done";
+  doneBtn.className = "dropdown-done-btn button-bubble calculate-button";
+  doneBtn.style.margin = "8px auto 0 auto";
+  doneBtn.style.width = "90%";
+  doneBtn.addEventListener("click", () => {
+    dropdown.style.display = "none";
+  });
+  dropdown.appendChild(doneBtn);
+
+  dropdown.style.display = "block";
 }
 
 searchInput.addEventListener("focus", () => {
@@ -418,10 +417,12 @@ document.getElementById("add-item").addEventListener("click", () => {
         selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
 
-  updateItemsList();
-  calculateQuote();
-  quantityInput.value = 1;
-  // markButtonDirty(); // Only addresses should reset button
+    updateItemsList();
+    calculateQuote();
+    quantityInput.value = 1;
+    // Keep dropdown open after adding
+    updateDropdown("");
+    // markButtonDirty(); // Only addresses should reset button
   }
 });
 
