@@ -444,12 +444,15 @@ document.getElementById("add-item").addEventListener("click", () => {
         selectedItems.push({ name: itemsData[inputName].name, quantity });
     }
 
-  updateItemsList();
-  calculateQuote();
-  quantityInput.value = 1;
-  // Keep dropdown open after adding
-  setTimeout(() => updateDropdown(searchInput.value), 0);
-  // markButtonDirty(); // Only addresses should reset button
+    updateItemsList();
+    calculateQuote();
+    quantityInput.value = 1;
+    // Always show full list after adding
+    setTimeout(() => {
+      searchInput.value = "";
+      updateDropdown("");
+    }, 0);
+    // markButtonDirty(); // Only addresses should reset button
   }
 });
 
