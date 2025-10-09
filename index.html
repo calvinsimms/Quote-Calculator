@@ -692,6 +692,7 @@ function calculateQuote(includeTravel = false) {
   selectedItems.forEach(i => totalCuFt += itemsData[i.name.toLowerCase()].cubicFeet * i.quantity);
 
   const trailerSizes = { "Small Trailer": 670, "Large Trailer": 750, "Both Trailers": 1420 };
+  const avgTrailerSize = 710;
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
 
   const trips = Math.max(1, Math.ceil(totalCuFt / trailerCapacity));
@@ -702,7 +703,7 @@ function calculateQuote(includeTravel = false) {
   if (numMen === 4) crewFactor = 0.6;
 
   const baseTimePerFullTrailer = 150; 
-  let timePerTrip = baseTimePerFullTrailer * (totalCuFt / trailerCapacity) * crewFactor; 
+  let timePerTrip = baseTimePerFullTrailer * (totalCuFt / avgTrailerSize) * crewFactor;
   timePerTrip *= 2; 
   if (elevatorActive) timePerTrip *= 1.3;
   let totalLoadUnloadTime = timePerTrip * trips; 
