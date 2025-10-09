@@ -695,38 +695,34 @@ function calculateQuote(includeTravel = false) {
   const trailerCapacity = trailerSizes[selectedTrailer] || 670;
 
   const trips = Math.max(1, Math.ceil(totalCuFt / trailerCapacity));
-
   const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100;
 
-  const avgTrailerSize = 710;
-  const baseTimePerFullTrailer = 150;
+  // Crew factors
   let crewFactor = 1.0;
   if (numMen === 3) crewFactor = 0.8;
   if (numMen === 4) crewFactor = 0.6;
 
-  const trailerEquivalents = totalCuFt / avgTrailerSize;
+  // ------------------ FIXED LOAD/UNLOAD TIME ------------------
+  const baseTimePerFullTrailer = 150; 
+  let timePerTrip = baseTimePerFullTrailer * (totalCuFt / trailerCapacity) * crewFactor; 
+  timePerTrip *= 2; 
+  if (elevatorActive) timePerTrip *= 1.3;
+  let totalLoadUnloadTime = timePerTrip * trips; 
 
-  let totalLoadUnloadTime = baseTimePerFullTrailer * trailerEquivalents * crewFactor * 2;
-
-  if (elevatorActive) {
-    totalLoadUnloadTime *= 1.3;
-  }
 
   if (includeTravel) {
+    if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes * ((2 * trips) - 1);
+    if (!isNaN(travelData.distanceMeters)) totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
 
-  if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes * ((2 * trips) - 1);
-  if (!isNaN(travelData.distanceMeters)) totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
+    if (!isNaN(travelData.startMinutes)) travelMinutes += travelData.startMinutes;
+    if (!isNaN(travelData.endMinutes)) travelMinutes += travelData.endMinutes;
 
-  if (!isNaN(travelData.startMinutes)) travelMinutes += travelData.startMinutes;
-  if (!isNaN(travelData.endMinutes)) travelMinutes += travelData.endMinutes;
-
-  if (!isNaN(travelData.startMeters)) totalDistanceMeters += travelData.startMeters;
-  if (!isNaN(travelData.endMeters)) totalDistanceMeters += travelData.endMeters;
+    if (!isNaN(travelData.startMeters)) totalDistanceMeters += travelData.startMeters;
+    if (!isNaN(travelData.endMeters)) totalDistanceMeters += travelData.endMeters;
   } else {
-  travelMinutes = travelData.minutes * ((2 * trips) - 1);
-  totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
+    travelMinutes = travelData.minutes * ((2 * trips) - 1);
+    totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
   }
-
 
   const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
   const totalHours = totalMinutesIncludingTravel / 60;
@@ -753,6 +749,7 @@ function calculateQuote(includeTravel = false) {
     <div class="totals-quote">$${quote.toFixed(2)}</div>
   `;
 }
+
 
 function markButtonDirty() {
   calculateBtn.classList.remove("calculated");
