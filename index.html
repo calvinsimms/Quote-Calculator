@@ -715,9 +715,8 @@ function calculateQuote(includeTravel = false) {
   const startMeters = travelData.startMeters || 0;
   const endMeters = travelData.endMeters || 0;
 
-  travelMinutes = mainTripMinutes * trips + startMinutes + endMinutes;
-  totalDistanceMeters = mainTripMeters * trips + startMeters + endMeters;
-
+  travelMinutes = startMinutes + mainTripMinutes * (trips * 2 - 1) + endMinutes;
+  totalDistanceMeters = startMeters + mainTripMeters * (trips * 2 - 1) + endMeters; 
 
   const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
   const totalHours = totalMinutesIncludingTravel / 60;
