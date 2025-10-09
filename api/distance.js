@@ -30,7 +30,6 @@ export default async function handler(req, res) {
     const data = await response.json();
     const route = data.routes?.[0];
 
-    // Parse duration string (e.g., '500s') and convert to minutes
     let durationMinutes = 0;
     if (route?.duration && typeof route.duration === 'string') {
       const match = route.duration.match(/(\d+)s/);
