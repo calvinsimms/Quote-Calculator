@@ -697,12 +697,10 @@ function calculateQuote(includeTravel = false) {
   const trips = Math.max(1, Math.ceil(totalCuFt / trailerCapacity));
   const trailerUsagePercent = (totalCuFt / trailerCapacity) * 100;
 
-  // Crew factors
   let crewFactor = 1.0;
   if (numMen === 3) crewFactor = 0.8;
   if (numMen === 4) crewFactor = 0.6;
 
-  // ------------------ FIXED LOAD/UNLOAD TIME ------------------
   const baseTimePerFullTrailer = 150; 
   let timePerTrip = baseTimePerFullTrailer * (totalCuFt / trailerCapacity) * crewFactor; 
   timePerTrip *= 2; 
@@ -711,18 +709,23 @@ function calculateQuote(includeTravel = false) {
 
 
   if (includeTravel) {
-    if (!isNaN(travelData.minutes)) travelMinutes = travelData.minutes * ((2 * trips) - 1);
-    if (!isNaN(travelData.distanceMeters)) totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
 
-    if (!isNaN(travelData.startMinutes)) travelMinutes += travelData.startMinutes;
-    if (!isNaN(travelData.endMinutes)) travelMinutes += travelData.endMinutes;
+    const mainTripMinutes = travelData.minutes || 0;
+    const mainTripMeters = travelData.distanceMeters || 0;
 
-    if (!isNaN(travelData.startMeters)) totalDistanceMeters += travelData.startMeters;
-    if (!isNaN(travelData.endMeters)) totalDistanceMeters += travelData.endMeters;
+
+    const startMinutes = travelData.startMinutes || 0;
+    const endMinutes = travelData.endMinutes || 0;
+    const startMeters = travelData.startMeters || 0;
+    const endMeters = travelData.endMeters || 0;
+
+    travelMinutes = mainTripMinutes * trips + startMinutes + endMinutes;
+    totalDistanceMeters = mainTripMeters * trips + startMeters + endMeters;
   } else {
-    travelMinutes = travelData.minutes * ((2 * trips) - 1);
-    totalDistanceMeters = travelData.distanceMeters * ((2 * trips) - 1);
+    travelMinutes = (travelData.minutes || 0) * trips;
+    totalDistanceMeters = (travelData.distanceMeters || 0) * trips;
   }
+
 
   const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
   const totalHours = totalMinutesIncludingTravel / 60;
