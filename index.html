@@ -467,6 +467,7 @@ function updateItemsList(){
 }
 
 // ------------------------ Autocomplete ------------------------
+const startInput = document.getElementById("start-address");
 const loadInput = document.getElementById("load-address");
 const unloadInput = document.getElementById("unload-address");
 
@@ -562,6 +563,7 @@ function setupAutocomplete(inputEl, dropdownEl) {
   });
 }
 
+setupAutocomplete(startInput, document.getElementById("start-dropdown"));
 setupAutocomplete(loadInput, document.getElementById("load-dropdown"));
 setupAutocomplete(unloadInput, document.getElementById("unload-dropdown"));
 
