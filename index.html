@@ -703,10 +703,10 @@ function calculateQuote(includeTravel = false) {
   if (numMen === 4) crewFactor = 0.6;
 
   const baseTimePerFullTrailer = 150; 
-  let timePerTrip = baseTimePerFullTrailer * (totalCuFt / avgTrailerSize) * crewFactor;
-  timePerTrip *= 2; 
-  if (elevatorActive) timePerTrip *= 1.3;
-  let totalLoadUnloadTime = timePerTrip * trips; 
+  let workMinutes = baseTimePerFullTrailer * (totalCuFt / avgTrailerSize) * crewFactor;
+  workMinutes *= 2; 
+  if (elevatorActive) workMinutes *= 1.3;
+
 
   const mainTripMinutes = travelData.minutes || 0;
   const mainTripMeters = travelData.distanceMeters || 0;
@@ -718,7 +718,7 @@ function calculateQuote(includeTravel = false) {
   travelMinutes = startMinutes + mainTripMinutes * (trips * 2 - 1) + endMinutes;
   totalDistanceMeters = startMeters + mainTripMeters * (trips * 2 - 1) + endMeters; 
 
-  const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
+  const totalMinutesIncludingTravel = workMinutes + travelMinutes;
   const totalHours = totalMinutesIncludingTravel / 60;
 
   let crewHourlyRate = 120;
@@ -735,7 +735,7 @@ function calculateQuote(includeTravel = false) {
     <div class="totals-row"><span>Cubic Feet</span><span>${totalCuFt}</span></div>
     <div class="totals-row"><span>Trips</span><span>${trips}</span></div>
     <div class="totals-row"><span>Trailer Usage</span><span>${trailerUsagePercent.toFixed(1)}%</span></div>
-    <div class="totals-row"><span>Work Time</span><span>${formatTime(Math.round(totalLoadUnloadTime))}</span></div>
+    <div class="totals-row"><span>Work Time</span><span>${formatTime(Math.round(workMinutes))}</span></div>
     <div class="totals-row"><span>Travel Time</span><span>${formatTime(Math.round(travelMinutes))}</span></div>
     <div class="totals-row"><span>Total Distance</span><span>${totalDistanceKm.toFixed(1)} km</span></div>
     <div class="totals-row"><span>Total Time</span><span>${formatTime(Math.round(totalMinutesIncludingTravel))}</span></div>
