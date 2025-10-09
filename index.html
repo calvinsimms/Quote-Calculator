@@ -510,8 +510,10 @@ async function getAutocompleteSuggestions(query) {
   }
 }
 
-searchInput.addEventListener('focus', () => {
-  sessionToken = uuidv4(); 
+[startInput, loadInput, unloadInput].forEach(input => {
+  input.addEventListener('focus', () => {
+    sessionToken = uuidv4();
+  });
 });
 
 
