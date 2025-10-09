@@ -707,24 +707,15 @@ function calculateQuote(includeTravel = false) {
   if (elevatorActive) timePerTrip *= 1.3;
   let totalLoadUnloadTime = timePerTrip * trips; 
 
+  const mainTripMinutes = travelData.minutes || 0;
+  const mainTripMeters = travelData.distanceMeters || 0;
+  const startMinutes = travelData.startMinutes || 0;
+  const endMinutes = travelData.endMinutes || 0;
+  const startMeters = travelData.startMeters || 0;
+  const endMeters = travelData.endMeters || 0;
 
-  if (includeTravel) {
-
-    const mainTripMinutes = travelData.minutes || 0;
-    const mainTripMeters = travelData.distanceMeters || 0;
-
-
-    const startMinutes = travelData.startMinutes || 0;
-    const endMinutes = travelData.endMinutes || 0;
-    const startMeters = travelData.startMeters || 0;
-    const endMeters = travelData.endMeters || 0;
-
-    travelMinutes = mainTripMinutes * trips + startMinutes + endMinutes;
-    totalDistanceMeters = mainTripMeters * trips + startMeters + endMeters;
-  } else {
-    travelMinutes = (travelData.minutes || 0) * trips;
-    totalDistanceMeters = (travelData.distanceMeters || 0) * trips;
-  }
+  travelMinutes = mainTripMinutes * trips + startMinutes + endMinutes;
+  totalDistanceMeters = mainTripMeters * trips + startMeters + endMeters;
 
 
   const totalMinutesIncludingTravel = totalLoadUnloadTime + travelMinutes;
